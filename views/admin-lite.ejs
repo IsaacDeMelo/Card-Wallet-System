@@ -434,8 +434,7 @@
 
       setStatus('Forjando no banco...', '', liteCreateStatus);
       try {
-        // Usa a rota principal ou lite para injetar a carta
-        const response = await fetch('/api/admin/cards', { // Ajuste se seu backend usa rota diferente
+        const response = await fetch('/api/admin-lite/cards', {
           method: 'POST',
           headers: getHeaders(),
           body: JSON.stringify({ adminPassword, cardId, title, categoria, draw: "", url: "" })

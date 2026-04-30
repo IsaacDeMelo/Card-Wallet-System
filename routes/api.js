@@ -458,6 +458,52 @@ router.get('/admin-lite/overview', async (req, res) => {
   }
 });
 
+router.post('/admin-lite/cards', async (req, res) => {
+  try {
+    if (!ensureAdminLiteAccess(req, res)) {
+      return;
+    }
+
+    const { cardId, title, categoria, draw, url } = req.body;
+
+    if (!cardId || !title || !categoria) {
+      return res.status(400).json({
+        success: false,
+        message: 'cardId, title e categoria sao obrigatorios.',
+      });
+    }
+
+    const existingCard = await Card.findOne({ cardId });
+
+    if (existingCard) {
+      return res.status(409).json({
+        success: false,
+        message: 'Ja existe uma carta com esse cardId.',
+      });
+    }
+
+    const card = await Card.create({
+      cardId,
+      title,
+      categoria,
+      draw: draw || '',
+      url: url || '',
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Carta criada com sucesso pelo admin-lite.',
+      card,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Falha ao criar a carta no admin-lite.',
+      error: error.message,
+    });
+  }
+});
+
 router.delete('/admin-lite/cards/:cardId', async (req, res) => {
   try {
     if (!ensureAdminLiteAccess(req, res)) {
