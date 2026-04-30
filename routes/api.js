@@ -5,6 +5,7 @@ const Card = require('../models/Card');
 
 const router = express.Router();
 const ADMIN_PANEL_PASSWORD = 'AaOWoaONmKjKo';
+const ADMIN_LITE_PASSWORD = 'adminrpg090920201010';
 
 function sanitizeUser(user) {
   const safeUser = user.toObject ? user.toObject() : { ...user };
@@ -34,6 +35,28 @@ function ensureAdminAccess(req, res) {
   return false;
 }
 
+function hasAdminLiteAccess(req) {
+  const password =
+    (req.body && req.body.adminPassword) ||
+    req.headers['x-admin-password'] ||
+    req.query.adminPassword;
+
+  return password === ADMIN_LITE_PASSWORD;
+}
+
+function ensureAdminLiteAccess(req, res) {
+  if (hasAdminLiteAccess(req)) {
+    return true;
+  }
+
+  res.status(401).json({
+    success: false,
+    message: 'Acesso admin-lite negado.',
+  });
+
+  return false;
+}
+
 async function resolveUserByIdentity({ username }) {
   if (username) {
     return User.findOne({ username });
@@ -57,6 +80,58 @@ async function buildWalletPayload(user) {
       card: cardsById.get(entry.cardId) || null,
     })),
   };
+}
+
+async function buildAdminLitePayload() {
+  const [users, cards] = await Promise.all([
+    User.find().sort({ username: 1 }),
+    Card.find().sort({ title: 1 }),
+  ]);
+
+  const cardsById = new Map(cards.map((card) => [card.cardId, card]));
+
+  return {
+    cards: cards.map((card) => ({
+      cardId: card.cardId,
+      title: card.title || card.cardId,
+      categoria: card.categoria || '',
+    })),
+    users: users.map((user) => {
+      const userCards = Array.isArray(user.cards) ? user.cards : [];
+
+      return {
+        username: user.username,
+        whatsapp: user.whatsapp,
+        clan: user.clan,
+        cards: userCards
+          .map((entry) => {
+            const card = cardsById.get(entry.cardId);
+
+            return {
+              title: card ? (card.title || card.cardId) : entry.cardId,
+              quantity: entry.quantity || 0,
+            };
+          })
+          .filter((entry) => entry.quantity > 0),
+      };
+    }),
+  };
+}
+
+async function deleteCardEverywhere(cardId) {
+  const [deletedCard] = await Promise.all([
+    Card.findOneAndDelete({ cardId }),
+    User.updateMany(
+      {},
+      {
+        $pull: {
+          cards: { cardId },
+        },
+      }
+    ),
+  ]);
+
+  return deletedCard;
 }
 
 router.post('/register', async (req, res) => {
@@ -356,6 +431,66 @@ router.post('/wallet/customDraw', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Falha ao salvar o desenho personalizado.',
+      error: error.message,
+    });
+  }
+});
+
+router.get('/admin-lite/overview', async (req, res) => {
+  try {
+    if (!ensureAdminLiteAccess(req, res)) {
+      return;
+    }
+
+    const payload = await buildAdminLitePayload();
+
+    return res.json({
+      success: true,
+      cards: payload.cards,
+      users: payload.users,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Falha ao carregar o admin-lite.',
+      error: error.message,
+    });
+  }
+});
+
+router.delete('/admin-lite/cards/:cardId', async (req, res) => {
+  try {
+    if (!ensureAdminLiteAccess(req, res)) {
+      return;
+    }
+
+    const { cardId } = req.params;
+
+    if (!cardId) {
+      return res.status(400).json({
+        success: false,
+        message: 'cardId e obrigatorio.',
+      });
+    }
+
+    const deletedCard = await deleteCardEverywhere(cardId);
+
+    if (!deletedCard) {
+      return res.status(404).json({
+        success: false,
+        message: 'Carta nao encontrada.',
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Carta excluida com sucesso.',
+      cardId,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Falha ao excluir a carta.',
       error: error.message,
     });
   }

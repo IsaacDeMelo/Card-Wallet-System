@@ -13,4 +13,8 @@ router.get('/admin', (req, res) => {
     res.render('admin');
 });
 
+router.get('/admin-lite', (req, res) => {
+    res.render('admin-lite');
+});
+
 module.exports = router;
