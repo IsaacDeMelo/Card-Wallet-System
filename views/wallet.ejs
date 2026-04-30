@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Card Wallet - Ninja</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Fonte Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --bg-card: rgba(255, 255, 255, 0.03);
+      --text: #f8f9ff;
+      --text-muted: #94a3b8;
+      --line: rgba(255, 255, 255, 0.1);
+      --panel: rgba(15, 23, 42, 0.7);
+      
+      --error: #ff5f5f;
+      --ok: #10b981;
+      
+      --uchiha: #ef4444;
+      --senju: #10b981;
+
+      /* Cores de Raridade */
+      --color-lenda: #fbbf24;
+      --color-epica: #a855f7;
+      --color-rara: #38bdf8;
+      --color-comum: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 0%, rgba(239, 68, 68, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 85% 100%, rgba(56, 189, 248, 0.08) 0%, transparent 40%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+
+    /* --- LAYOUT PRINCIPAL --- */
+    .shell {
+      width: min(1200px, 92vw);
+      margin: 0 auto 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* --- HEADER E CONTROLES (PESQUISA) --- */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 0 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .title {
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: linear-gradient(to right, #fff, #94a3b8);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .btn-icon {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line);
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.05);
+    }
+
+    .btn-icon svg { width: 22px; height: 22px; fill: currentColor; }
+
+    /* --- ÁREA DE PESQUISA --- */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: var(--panel);
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .search-bar {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-bar input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px 14px 44px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .search-bar input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .search-bar svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      fill: var(--text-muted);
+    }
+
+    /* --- MENU LATERAL (SIDEBAR) --- */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 40;
+    }
+    .overlay.active { opacity: 1; pointer-events: auto; }
+
+    .sidebar {
+      position: fixed;
+      top: 0; right: -100%;
+      width: min(340px, 85vw);
+      height: 100vh;
+      background: #0f172a;
+      border-left: 1px solid var(--line);
+      box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+      z-index: 50;
+      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      gap: 24px;
+      overflow-y: auto;
+    }
+    .sidebar.active { right: 0; }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 16px;
+    }
+    .sidebar-header h2 { font-size: 1.2rem; font-weight: 700; }
+
+    .sidebar-section { display: flex; flex-direction: column; gap: 12px; }
+    .sidebar-section h3 { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    .status { font-size: 0.9rem; font-weight: 500; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); text-align: center; }
+    .status.error { color: var(--error); background: rgba(255, 95, 95, 0.1); }
+    .status.ok { color: var(--ok); background: rgba(16, 185, 129, 0.1); }
+
+    .chip {
+      display: inline-flex; justify-content: center; padding: 8px; border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3); border: 1px solid var(--line); font-size: 0.9rem; font-weight: 600;
+    }
+
+    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .kpi { background: rgba(0,0,0,0.2); border: 1px solid var(--line); padding: 12px; border-radius: 12px; text-align: center; }
+    .kpi p { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
+    .kpi h4 { font-size: 1.2rem; font-weight: 700; }
+    
+    /* Faz a 3ª KPI ocupar a linha inteira para ficar simétrico no grid de 2 colunas */
+    .kpi:nth-child(3) { grid-column: 1 / -1; }
+
+    .btn {
+      width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05); color: #fff; font-weight: 600; font-size: 0.95rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.1); }
+    .btn.primary { background: linear-gradient(135deg, #e11d48, #3b82f6); border: none; }
+    .btn.primary:hover { filter: brightness(1.1); }
+
+    /* --- TOAST DE NOTIFICAÇÃO --- */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--ok);
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 9999;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast.error {
+      background: var(--error);
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(255, 95, 95, 0.4);
+    }
+
+    /* --- GRID DE CARTAS --- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    /* --- ESTILO DAS CARTAS --- */
+    .card {
+      position: relative;
+      border-radius: 16px;
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      cursor: pointer;
+      opacity: 0;
+      animation: riseUp 0.4s ease forwards;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: var(--glow);
+      box-shadow: 0 10px 30px -10px var(--glow), inset 0 0 15px -10px var(--glow);
+    }
+
+    .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .name { font-size: 1rem; font-weight: 700; line-height: 1.2; color: #fff; pointer-events: none; }
+    .qty {
+      background: var(--glow); color: #000; border-radius: 6px; padding: 2px 6px;
+      font-weight: 800; font-size: 0.8rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+
+    .art {
+      width: 100%; aspect-ratio: 3/4; border-radius: 10px; object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); transition: filter 0.3s;
+      pointer-events: none;
+    }
+    .card:hover .art { filter: brightness(1.1) contrast(1.05); }
+
+    .empty-art {
+      display: flex; align-items: center; justify-content: center; color: var(--text-muted);
+      font-size: 0.8rem; text-transform: uppercase; aspect-ratio: 3/4;
+      pointer-events: none;
+    }
+
+    .foot { display: flex; flex-direction: column; gap: 8px; margin-top: auto; pointer-events: none; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      border-radius: 6px; padding: 4px 8px; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+    }
+    .tag.rarity { color: var(--glow); border-color: rgba(255,255,255,0.2); }
+    .tag.draw { color: #fff; border-color: rgba(255,255,255,0.3); }
+
+    .empty-state {
+      grid-column: 1 / -1; padding: 60px 20px; text-align: center;
+      border: 2px dashed var(--line); border-radius: 20px; background: rgba(0,0,0,0.2);
+    }
+    .empty-state h2 { color: #fff; margin-bottom: 8px; }
+    .empty-state p { color: var(--text-muted); }
+
+    @keyframes riseUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      .name { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toast (Aviso Copiado) -->
+  <div id="toast" class="toast">Carta copiada com sucesso!</div>
+
+  <!-- Menu Lateral -->
+  <div class="overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>Menu Ninja</h2>
+      <button class="btn-icon" id="closeMenu" style="width: 36px; height: 36px;">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+
+    <p class="status" id="statusText">Aguardando...</p>
+
+    <div class="sidebar-section">
+      <h3>Perfil</h3>
+      <span class="chip" id="playerName">Shinobi: -</span>
+      <span class="chip" id="playerClan" style="border-color: var(--line);">Clã: -</span>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Coleção</h3>
+      <div class="kpi-grid">
+        <article class="kpi"><p>Tipos Únicos</p><h4 id="kpiTypes">0</h4></article>
+        <article class="kpi"><p>Total de Cartas</p><h4 id="kpiCopies">0</h4></article>
+        <article class="kpi"><p>Melhor Categoria</p><h4 id="kpiTopCategory">-</h4></article>
+      </div>
+    </div>
+
+    <div class="sidebar-section" style="margin-top: auto;">
+      <button class="btn primary" id="refreshBtn">Sincronizar Cartas</button>
+    </div>
+  </aside>
+
+  <!-- Layout Principal -->
+  <main class="shell">
+    <header class="topbar">
+      <h1 class="title">Carteira</h1>
+      <button class="btn-icon" id="openMenu" title="Abrir Menu">
+        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+    </header>
+
+    <section class="controls">
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" id="searchInput" placeholder="Pesquisar carta ou termo do texto..." autocomplete="off" />
+      </div>
+    </section>
+
+    <section class="grid" id="walletGrid"></section>
+  </main>
+
+  <script>
+    // Referências DOM
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const openMenuBtn = document.getElementById('openMenu');
+    const closeMenuBtn = document.getElementById('closeMenu');
+    const searchInput = document.getElementById('searchInput');
+    const grid = document.getElementById('walletGrid');
+    const toast = document.getElementById('toast');
+
+    const statusText = document.getElementById('statusText');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const playerName = document.getElementById('playerName');
+    const playerClan = document.getElementById('playerClan');
+    const kpiTypes = document.getElementById('kpiTypes');
+    const kpiCopies = document.getElementById('kpiCopies');
+    const kpiTopCategory = document.getElementById('kpiTopCategory');
+
+    let activeUsername = '';
+    let allCards = []; 
+    let currentRenderedCards =[]; // Salva a lista de cartas visíveis atualmente para a função de copiar
+    let toastTimeout;
+
+    // --- LÓGICA DO MENU LATERAL E TOAST ---
+    function openMenu() { sidebar.classList.add('active'); overlay.classList.add('active'); }
+    function closeMenu() { sidebar.classList.remove('active'); overlay.classList.remove('active'); }
+    openMenuBtn.addEventListener('click', openMenu);
+    closeMenuBtn.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    function showToast(msg, type = 'success') {
+      toast.textContent = msg;
+      toast.className = 'toast show';
+      if (type === 'error') toast.classList.add('error');
+      
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    const categoriaLivre = (value) => {
+      const v = String(value || '').trim();
+      return v || 'Sem categoria';
+    };
+
+    const accentFromText = (text) => {
+      const source = String(text || '').trim().toLowerCase();
+      if (!source) {
+        return 'rgba(203, 213, 225, 0.72)';
+      }
+
+      let hash = 0;
+      for (let index = 0; index < source.length; index += 1) {
+        hash = (hash * 31 + source.charCodeAt(index)) % 360;
+      }
+
+      return `hsl(${hash} 85% 62%)`;
+    };
+
+    function setStatus(message, type) {
+      statusText.textContent = message;
+      statusText.className = 'status';
+      if (type) statusText.classList.add(type);
+    }
+
+    function renderEmpty(title, msg) {
+      grid.innerHTML = `
+        <article class="empty-state">
+          <h2>${title}</h2>
+          <p>${msg}</p>
+        </article>
+      `;
+    }
+
+    function updateClanChip(clan) {
+      const c = String(clan).toLowerCase();
+      playerClan.style.borderColor = "var(--line)";
+      playerClan.style.color = "var(--text)";
+      if (c === 'uchiha') { playerClan.style.borderColor = "var(--uchiha)"; playerClan.style.color = "#fca5a5"; }
+      if (c === 'senju') { playerClan.style.borderColor = "var(--senju)"; playerClan.style.color = "#6ee7b7"; }
+    }
+
+    // --- RENDERIZAÇÃO ---
+    function renderCards(cardsToRender) {
+      currentRenderedCards = cardsToRender;
+
+      if (!cardsToRender.length) {
+        if (allCards.length === 0) {
+          renderEmpty('Bolsa Vazia', 'Você ainda não possui cartas em sua carteira.');
+        } else {
+          renderEmpty('Nada encontrado', 'Nenhuma carta corresponde a essa pesquisa.');
+        }
+        return;
+      }
+
+      grid.innerHTML = cardsToRender.map((entry, index) => {
+        const c = entry.card || {};
+        const categoria = categoriaLivre(c.categoria);
+        const glow = accentFromText(categoria);
+        const title = c.title || 'Desconhecida';
+        const url = c.url || '';
+        const quantity = Number(entry.quantity) || 0;
+        const delay = index * 0.03;
+
+        // O 'data-index' armazena a posição da carta na tela para copiarmos o draw correto depois
+        return `
+          <article class="card" data-index="${index}" style="animation-delay: ${delay}s; --glow: ${glow};" title="Clique para copiar o texto da carta">
+            <div class="head">
+              <h3 class="name">${title}</h3>
+              <span class="qty">x${quantity}</span>
+            </div>
+            ${url
+              ? `<img class="art" src="${url}" alt="${title}" loading="lazy" />`
+              : `<div class="art empty-art">Sem Arte</div>`}
+            <div class="foot">
+              <div class="tags">
+                <span class="tag rarity">${categoria}</span>
+                <span class="tag draw">📋 Copiar Carta</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // --- COPIAR PARA A ÁREA DE TRANSFERÊNCIA ---
+    grid.addEventListener('click', async (e) => {
+      const cardEl = e.target.closest('.card');
+      if (!cardEl) return;
+
+      const idx = cardEl.getAttribute('data-index');
+      if (idx === null) return;
+
+      const entry = currentRenderedCards[idx];
+      const drawText = entry && entry.card ? entry.card.draw : '';
+
+      if (!drawText) {
+        showToast('Esta carta não possui texto associado!', 'error');
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(drawText);
+        showToast('Carta copiada para a área de transferência!');
+      } catch (err) {
+        showToast('Não foi possível copiar. Verifique as permissões do navegador.', 'error');
+      }
+    });
+
+    // --- FILTRAGEM ---
+    function applyFilters() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      
+      const filtered = allCards.filter(entry => {
+        const c = entry.card || {};
+        const title = (c.title || '').toLowerCase();
+
+        return title.includes(searchTerm);
+      });
+
+      renderCards(filtered);
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+
+    // --- CARREGAMENTO ---
+    function computeKpis(cards) {
+      const copies = cards.reduce((acc, c) => acc + (Number(c.quantity) || 0), 0);
+      const categoryCount = {}; 
+
+      cards.forEach((entry) => {
+        const cat = categoriaLivre(entry && entry.card ? entry.card.categoria : '');
+        const qty = Number(entry.quantity) || 0;
+        categoryCount[cat] = (categoryCount[cat] || 0) + qty;
+      });
+
+      const topCat = Object.entries(categoryCount).sort((a, b) => b[1] - a[1])[0];
+
+      kpiTypes.textContent = cards.length;
+      kpiCopies.textContent = copies;
+      kpiTopCategory.textContent = topCat ? topCat[0].toUpperCase() : '-';
+    }
+
+    async function loadWalletByUsername(username) {
+      if (!username) {
+        playerName.textContent = 'Shinobi: -';
+        playerClan.textContent = 'Clã: -';
+        setStatus('Usuário não identificado', 'error');
+        renderEmpty('Quem é você?', 'Faça cadastro em /home para vincular sua carteira.');
+        return;
+      }
+
+      setStatus('Sincronizando chakra...', '');
+      grid.innerHTML = ''; 
+
+      try {
+        const response = await fetch(`/api/walletByUsername?username=${encodeURIComponent(username)}`);
+        const data = await response.json();
+
+        if (!response.ok || !data.success) throw new Error(data.message || 'Falha ao carregar.');
+
+        const user = data.user || {};
+        allCards = Array.isArray(data.cards) ? data.cards :[]; 
+
+        playerName.textContent = user.username || '-';
+        playerClan.textContent = `Clã: ${String(user.clan || '-').toUpperCase()}`;
+        updateClanChip(user.clan);
+
+        computeKpis(allCards);
+        applyFilters(); 
+        
+        setStatus('Sincronizado', 'ok');
+      } catch (error) {
+        setStatus(error.message, 'error');
+        renderEmpty('Erro de Leitura', 'Não foi possível acessar os pergaminhos.');
+        allCards =[];
+      }
+    }
+
+    refreshBtn.addEventListener('click', () => {
+      loadWalletByUsername(activeUsername);
+      closeMenu();
+    });
+
+    // --- INICIALIZAÇÃO ---
+    window.addEventListener('load', () => {
+      const params = new URLSearchParams(window.location.search);
+      const fromQuery = (params.get('username') || '').trim();
+      const fromStorage = (localStorage.getItem('walletUsername') || '').trim();
+
+      activeUsername = fromQuery || fromStorage;
+      if (fromQuery) localStorage.setItem('walletUsername', fromQuery);
+
+      searchInput.value = '';
+
+      loadWalletByUsername(activeUsername);
+    });
+  </script>
+</body>
+</html>

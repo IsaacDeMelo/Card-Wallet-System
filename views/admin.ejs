@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Card Wallet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-card-strong: rgba(255, 255, 255, 0.07);
+      --text: #f8f9ff;
+      --text-muted: #94a3b8;
+      --line: rgba(255, 255, 255, 0.12);
+      --panel: rgba(15, 23, 42, 0.72);
+      --error: #ff5f5f;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --uchiha: #ef4444;
+      --senju: #10b981;
+      --lenda: #fbbf24;
+      --epica: #a855f7;
+      --rara: #38bdf8;
+      --comum: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(239, 68, 68, 0.12) 0%, transparent 38%),
+        radial-gradient(circle at 85% 100%, rgba(56, 189, 248, 0.1) 0%, transparent 36%),
+        linear-gradient(125deg, #070b12, var(--bg-dark) 55%, #111b2c);
+      overflow-x: hidden;
+    }
+
+    .shell {
+      width: min(1180px, 92vw);
+      margin: 24px auto 40px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero,
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.24);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .title-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      font-size: clamp(1.3rem, 3.6vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      line-height: 1.5;
+      font-size: 0.95rem;
+      max-width: 72ch;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      font-size: 0.84rem;
+    }
+
+    .status {
+      min-height: 22px;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    .status.ok {
+      color: var(--ok);
+    }
+
+    .status.error {
+      color: var(--error);
+    }
+
+    .status.warn {
+      color: var(--warn);
+    }
+
+    .gate {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn,
+    .field,
+    select,
+    textarea {
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .btn {
+      min-height: 44px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #e11d48, #3b82f6);
+      border: none;
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .btn.small {
+      min-height: 38px;
+      padding: 8px 12px;
+      font-size: 0.86rem;
+    }
+
+    .field,
+    select,
+    textarea {
+      width: 100%;
+      background: rgba(8, 13, 23, 0.62);
+      min-height: 44px;
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    textarea.field {
+      min-height: 250px;
+      resize: vertical;
+      white-space: pre-wrap;
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.85fr);
+      gap: 14px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel {
+      padding: 14px;
+    }
+
+    .panel h2 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .editor-top {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .editor-mode {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+    }
+
+    .helper {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      max-height: 700px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .list-item {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      background: var(--panel);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .list-item-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .list-item h3 {
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+
+    .muted {
+      color: var(--text-muted);
+      font-size: 0.86rem;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(0, 0, 0, 0.26);
+      color: var(--text-muted);
+      padding: 4px 8px;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .badge.lenda {
+      color: var(--lenda);
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    .badge.epica {
+      color: #e9c6ff;
+      border-color: rgba(168, 85, 247, 0.28);
+    }
+
+    .badge.rara {
+      color: #b8e8ff;
+      border-color: rgba(56, 189, 248, 0.28);
+    }
+
+    .badge.comum {
+      color: #e5edf7;
+      border-color: rgba(203, 213, 225, 0.18);
+    }
+
+    .preview {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.22);
+      padding: 10px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #eef4ff;
+      font-size: 0.8rem;
+      line-height: 1.35;
+      max-height: 180px;
+      overflow: auto;
+    }
+
+    .item-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .select-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .select-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .empty {
+      border: 1px dashed rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    @media (max-width: 960px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid,
+      .select-grid,
+      .gate {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="title-row">
+        <div>
+          <h1 class="title">Painel Admin Ninja</h1>
+          <p class="subtitle">
+            Crie, edite e distribua cartas por usuario. O campo <b>draw</b> guarda o texto exato da carta e a wallet copia esse conteudo com os espacos preservados. A categoria é livre.
+          </p>
+        </div>
+        <div class="pill-row">
+          <span class="pill">Tema Naruto</span>
+          <span class="pill">Mobile first</span>
+          <span class="pill">Draw copiavel</span>
+        </div>
+      </div>
+
+      <div id="authBlock">
+        <div class="gate">
+          <input class="field" id="adminPassword" type="password" placeholder="Senha admin" autocomplete="current-password" />
+          <button class="btn primary" id="unlockBtn" type="button">Entrar no Admin</button>
+        </div>
+      </div>
+
+      <div id="adminBlock" class="hidden" style="display: none;">
+        <div class="button-row">
+          <button class="btn secondary" id="refreshDataBtn" type="button">Atualizar dados</button>
+          <button class="btn secondary" id="goWalletBtn" type="button">Ir para wallet</button>
+          <button class="btn secondary" id="logoutAdminBtn" type="button">Sair</button>
+        </div>
+      </div>
+
+      <p class="status" id="statusText"></p>
+    </section>
+
+    <section class="dashboard hidden" id="adminContent" style="display: none;">
+      <div class="stack">
+        <article class="panel">
+          <div class="editor-top">
+            <h2 id="editorTitle">Criar carta</h2>
+            <span class="editor-mode" id="editorMode">Modo criacao</span>
+          </div>
+
+          <p class="helper" style="margin-bottom: 12px;">
+            Selecione uma carta na lista para editar. O campo draw aceita quebras de linha e espacos no desenho sem encurtar o texto.
+          </p>
+
+          <div class="form-grid">
+            <input class="field" id="cardIdInput" placeholder="cardId (ex: bobina001)" />
+            <input class="field" id="titleInput" placeholder="Titulo da carta" />
+            <input class="field" id="categoriaInput" placeholder="Categoria livre (ex: Nintai, Fuuton, Taijutsu)" />
+            <input class="field" id="urlInput" placeholder="URL da imagem (opcional)" />
+            <textarea class="field full" id="drawInput" placeholder="Cole aqui o draw completo da carta, com espacos e quebras de linha."></textarea>
+            <div class="full button-row">
+              <button class="btn primary" id="saveCardBtn" type="button">Criar carta</button>
+              <button class="btn secondary" id="clearCardBtn" type="button">Limpar editor</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Inventario do usuario</h2>
+          <div class="select-grid">
+            <select id="usernameSelect"></select>
+            <select id="cardSelect"></select>
+            <input class="field" id="quantityInput" type="number" min="1" value="1" placeholder="Quantidade" />
+            <div class="button-row full">
+              <button class="btn primary" id="assignBtn" type="button">Adicionar carta</button>
+              <button class="btn secondary" id="removeBtn" type="button">Remover carta</button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="stack">
+        <article class="panel">
+          <h2>Usuarios</h2>
+          <div class="list" id="usersList"></div>
+        </article>
+
+        <article class="panel">
+          <h2>Cartas globais</h2>
+          <div class="list" id="cardsList"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const statusText = document.getElementById('statusText');
+    const authBlock = document.getElementById('authBlock');
+    const adminBlock = document.getElementById('adminBlock');
+    const adminContent = document.getElementById('adminContent');
+
+    const adminPasswordInput = document.getElementById('adminPassword');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const refreshDataBtn = document.getElementById('refreshDataBtn');
+    const goWalletBtn = document.getElementById('goWalletBtn');
+    const logoutAdminBtn = document.getElementById('logoutAdminBtn');
+
+    const editorTitle = document.getElementById('editorTitle');
+    const editorMode = document.getElementById('editorMode');
+    const cardIdInput = document.getElementById('cardIdInput');
+    const titleInput = document.getElementById('titleInput');
+    const categoriaInput = document.getElementById('categoriaInput');
+    const urlInput = document.getElementById('urlInput');
+    const drawInput = document.getElementById('drawInput');
+    const saveCardBtn = document.getElementById('saveCardBtn');
+    const clearCardBtn = document.getElementById('clearCardBtn');
+
+    const usernameSelect = document.getElementById('usernameSelect');
+    const cardSelect = document.getElementById('cardSelect');
+    const quantityInput = document.getElementById('quantityInput');
+    const assignBtn = document.getElementById('assignBtn');
+    const removeBtn = document.getElementById('removeBtn');
+
+    const usersList = document.getElementById('usersList');
+    const cardsList = document.getElementById('cardsList');
+
+    let adminPassword = '';
+    let usersCache = [];
+    let cardsCache = [];
+    let selectedCardId = '';
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function setStatus(message, type) {
+      statusText.textContent = message;
+      statusText.className = 'status';
+      if (type) {
+        statusText.classList.add(type);
+      }
+    }
+
+    function getAdminHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'x-admin-password': adminPassword,
+      };
+    }
+
+    function apiFetch(url, options = {}) {
+      return fetch(url, {
+        ...options,
+        headers: {
+          ...(options.headers || {}),
+          'x-admin-password': adminPassword,
+        },
+      });
+    }
+
+    async function fetchUsers() {
+      const response = await apiFetch('/api/admin/users');
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Falha ao listar usuarios.');
+      }
+
+      return data.users || [];
+    }
+
+    async function fetchCards() {
+      const response = await apiFetch('/api/admin/cards');
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Falha ao listar cartas.');
+      }
+
+      return data.cards || [];
+    }
+
+    function setEditorMode(card) {
+      selectedCardId = card ? card.cardId : '';
+      cardIdInput.value = card ? card.cardId : '';
+      cardIdInput.readOnly = Boolean(card);
+      cardIdInput.placeholder = card ? 'cardId bloqueado durante a edicao' : 'cardId (ex: bobina001)';
+
+      if (card) {
+        editorTitle.textContent = 'Editar carta';
+        editorMode.textContent = `Editando ${card.cardId}`;
+        saveCardBtn.textContent = 'Salvar alteracoes';
+      } else {
+        editorTitle.textContent = 'Criar carta';
+        editorMode.textContent = 'Modo criacao';
+        saveCardBtn.textContent = 'Criar carta';
+      }
+    }
+
+    function clearEditor() {
+      selectedCardId = '';
+      cardIdInput.readOnly = false;
+      cardIdInput.placeholder = 'cardId (ex: bobina001)';
+      cardIdInput.value = '';
+      titleInput.value = '';
+      categoriaInput.value = '';
+      urlInput.value = '';
+      drawInput.value = '';
+      setEditorMode(null);
+    }
+
+    function fillSelects() {
+      usernameSelect.innerHTML = usersCache.map((user) => {
+        const clan = String(user.clan || '').toUpperCase();
+        return `<option value="${escapeHtml(user.username)}">${escapeHtml(user.username)} (${escapeHtml(clan)})</option>`;
+      }).join('') || '<option value="">Sem usuarios</option>';
+
+      cardSelect.innerHTML = cardsCache.map((card) => {
+        return `<option value="${escapeHtml(card.cardId)}">${escapeHtml(card.cardId)} - ${escapeHtml(card.title)}</option>`;
+      }).join('') || '<option value="">Sem cartas</option>';
+    }
+
+    function renderUsers() {
+      if (!usersCache.length) {
+        usersList.innerHTML = '<div class="empty">Nenhum usuario cadastrado.</div>';
+        return;
+      }
+
+      usersList.innerHTML = usersCache.map((user) => {
+        const clan = String(user.clan || '').toLowerCase();
+        return `
+          <article class="list-item">
+            <div class="list-item-header">
+              <div>
+                <h3>${escapeHtml(user.username)}</h3>
+                <p class="muted">${escapeHtml(user.whatsapp || '-')}</p>
+              </div>
+              <span class="badge ${escapeHtml(clan || 'comum')}">${escapeHtml(String(user.clan || '-').toUpperCase())}</span>
+            </div>
+            <div class="badge-row">
+              <span class="badge">Cartas unicas: ${escapeHtml(user.uniqueCards)}</span>
+              <span class="badge">Total: ${escapeHtml(user.totalCards)}</span>
+            </div>
+            <div class="item-actions">
+              <button class="btn small secondary pick-user-btn" type="button" data-username="${escapeHtml(user.username)}">Selecionar</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderCards() {
+      if (!cardsCache.length) {
+        cardsList.innerHTML = '<div class="empty">Nenhuma carta criada.</div>';
+        return;
+      }
+
+      cardsList.innerHTML = cardsCache.map((card) => {
+        const category = String(card.categoria || 'comum').toLowerCase();
+        return `
+          <article class="list-item" data-card-id="${escapeHtml(card.cardId)}">
+            <div class="list-item-header">
+              <div>
+                <h3>${escapeHtml(card.title)}</h3>
+                <p class="muted">${escapeHtml(card.cardId)}</p>
+              </div>
+              <span class="badge ${escapeHtml(category)}">${escapeHtml(category)}</span>
+            </div>
+            <div class="badge-row">
+              <span class="badge">Draw copiado no click</span>
+              <span class="badge">${escapeHtml(card.url ? 'com arte' : 'sem arte')}</span>
+            </div>
+            <pre class="preview">${escapeHtml(card.draw)}</pre>
+            <div class="item-actions">
+              <button class="btn small primary edit-card-btn" type="button" data-card-id="${escapeHtml(card.cardId)}">Editar</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    async function refreshData() {
+      setStatus('Atualizando dados do painel...', '');
+      const [users, cards] = await Promise.all([fetchUsers(), fetchCards()]);
+      usersCache = users;
+      cardsCache = cards;
+      fillSelects();
+      renderUsers();
+      renderCards();
+      setStatus('Dados atualizados.', 'ok');
+    }
+
+    function unlockUi() {
+      authBlock.classList.add('hidden');
+      authBlock.style.display = 'none';
+      adminBlock.classList.remove('hidden');
+      adminBlock.style.display = '';
+      adminContent.classList.remove('hidden');
+      adminContent.style.display = '';
+    }
+
+    async function verifyAndUnlock() {
+      const password = adminPasswordInput.value.trim();
+      if (!password) {
+        setStatus('Informe a senha admin.', 'warn');
+        return;
+      }
+
+      adminPassword = password;
+
+      try {
+        await refreshData();
+        unlockUi();
+        sessionStorage.setItem('adminPassword', adminPassword);
+        setStatus('Acesso admin liberado.', 'ok');
+      } catch (error) {
+        adminPassword = '';
+        setStatus(error.message, 'error');
+      }
+    }
+
+    async function submitCard() {
+      const cardId = selectedCardId || cardIdInput.value.trim();
+      const payload = {
+        adminPassword,
+        cardId,
+        draw: drawInput.value,
+        title: titleInput.value.trim(),
+        categoria: categoriaInput.value.trim(),
+        url: urlInput.value.trim(),
+      };
+
+      if (!payload.cardId || !payload.draw || !payload.title || !payload.categoria) {
+        setStatus('Preencha cardId, draw, titulo e categoria.', 'warn');
+        return;
+      }
+
+      if (String(payload.draw).trim().length === 0) {
+        setStatus('O draw nao pode ser apenas espacos.', 'warn');
+        return;
+      }
+
+      const editing = Boolean(selectedCardId);
+      const endpoint = editing ? `/api/admin/cards/${encodeURIComponent(selectedCardId)}` : '/api/admin/cards';
+      const method = editing ? 'PUT' : 'POST';
+
+      setStatus(editing ? 'Salvando alteracoes...' : 'Criando carta...', '');
+
+      const response = await apiFetch(endpoint, {
+        method,
+        headers: getAdminHeaders(),
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || (editing ? 'Falha ao atualizar carta.' : 'Falha ao criar carta.'));
+      }
+
+      setStatus(data.message || (editing ? 'Carta atualizada.' : 'Carta criada.'), 'ok');
+      clearEditor();
+      await refreshData();
+    }
+
+    async function updateInventory(mode) {
+      const username = usernameSelect.value;
+      const cardId = cardSelect.value;
+      const quantity = Math.max(1, Number(quantityInput.value) || 1);
+
+      if (!username || !cardId) {
+        setStatus('Selecione usuario e carta.', 'warn');
+        return;
+      }
+
+      const endpoint = mode === 'add' ? '/api/admin/assign' : '/api/admin/remove';
+      const label = mode === 'add' ? 'Adicionando' : 'Removendo';
+
+      setStatus(`${label} carta no inventario...`, '');
+
+      const response = await apiFetch(endpoint, {
+        method: 'POST',
+        headers: getAdminHeaders(),
+        body: JSON.stringify({
+          adminPassword,
+          username,
+          cardId,
+          quantity,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Falha ao atualizar inventario.');
+      }
+
+      setStatus(data.message || 'Inventario atualizado.', 'ok');
+      await refreshData();
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('adminPassword');
+      window.location.reload();
+    }
+
+    unlockBtn.addEventListener('click', verifyAndUnlock);
+
+    refreshDataBtn.addEventListener('click', () => {
+      refreshData().catch((error) => setStatus(error.message, 'error'));
+    });
+
+    goWalletBtn.addEventListener('click', () => {
+      window.location.href = '/wallet';
+    });
+
+    logoutAdminBtn.addEventListener('click', logoutAdmin);
+
+    saveCardBtn.addEventListener('click', () => {
+      submitCard().catch((error) => setStatus(error.message, 'error'));
+    });
+
+    clearCardBtn.addEventListener('click', () => {
+      clearEditor();
+      setStatus('Editor limpo.', 'ok');
+    });
+
+    assignBtn.addEventListener('click', () => {
+      updateInventory('add').catch((error) => setStatus(error.message, 'error'));
+    });
+
+    removeBtn.addEventListener('click', () => {
+      updateInventory('remove').catch((error) => setStatus(error.message, 'error'));
+    });
+
+    cardsList.addEventListener('click', (event) => {
+      const editButton = event.target.closest('.edit-card-btn');
+      if (!editButton) {
+        return;
+      }
+
+      const cardId = editButton.getAttribute('data-card-id');
+      const card = cardsCache.find((entry) => entry.cardId === cardId);
+
+      if (!card) {
+        setStatus('Carta nao encontrada na lista.', 'error');
+        return;
+      }
+
+      cardIdInput.value = card.cardId;
+      titleInput.value = card.title || '';
+      categoriaInput.value = card.categoria || '';
+      urlInput.value = card.url || '';
+      drawInput.value = card.draw || '';
+      setEditorMode(card);
+      setStatus(`Carta ${card.cardId} carregada para edicao.`, 'ok');
+      document.getElementById('editorTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    usersList.addEventListener('click', (event) => {
+      const button = event.target.closest('.pick-user-btn');
+      if (!button) {
+        return;
+      }
+
+      const username = button.getAttribute('data-username');
+      if (username) {
+        usernameSelect.value = username;
+        setStatus(`Usuario ${username} selecionado para inventario.`, 'ok');
+      }
+    });
+
+    cardIdInput.addEventListener('input', () => {
+      if (!selectedCardId) {
+        return;
+      }
+
+      cardIdInput.value = selectedCardId;
+    });
+
+    window.addEventListener('load', () => {
+      const savedPassword = sessionStorage.getItem('adminPassword') || '';
+      if (savedPassword) {
+        adminPassword = savedPassword;
+        refreshData()
+          .then(() => {
+            unlockUi();
+            setStatus('Sessao admin restaurada.', 'ok');
+          })
+          .catch(() => {
+            sessionStorage.removeItem('adminPassword');
+            setStatus('Sessao admin expirada. Entre novamente.', 'warn');
+          });
+      } else {
+        setStatus('Painel bloqueado. Informe a senha admin para entrar.', 'warn');
+      }
+
+      setEditorMode(null);
+      clearEditor();
+    });
+  </script>
+</body>
+</html>

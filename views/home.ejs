@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RPG - Escolha seu Clã</title>
+    <!-- Importando fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&family=Bangers&family=Luckiest+Guy&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        h1, h2 { font-family: 'Cinzel', serif; }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Movimento super suave no fundo, sem brilho excessivo */
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .clan-box {
+            flex: 1;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: 150% 150%;
+        }
+
+        /* Cores de fundo neutras e maduras */
+        .clan-box.uchiha { 
+            background-image: linear-gradient(135deg, #330000, #110000, #000000);
+            animation: gradientMove 10s ease infinite;
+        }
+        
+        .clan-box.senju { 
+            background-image: linear-gradient(135deg, #00220a, #001105, #000000);
+            animation: gradientMove 10s ease infinite reverse;
+        }
+
+        .clan-box.collapsed { flex: 0; opacity: 0; pointer-events: none; }
+        .clan-box.expanded { flex: 1; }
+
+        /* =========================================
+           FLECHAS NEUTRAS E ELEGANTES
+        =========================================== */
+        .center-arrows {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            z-index: 50;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .arrow {
+            width: 30px;
+            height: 30px;
+            color: rgba(255, 255, 255, 0.5); /* Cor neutra, sem neon */
+        }
+
+        .arrow.up { animation: floatUp 2s infinite ease-in-out; }
+        .arrow.down { animation: floatDown 2s infinite ease-in-out; }
+
+        @keyframes floatUp {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes floatDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        /* Títulos sem neon brega, apenas contraste elegante */
+        .clan-title {
+            position: absolute;
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 10px;
+            z-index: 10;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8); /* Sombra escura de profundidade */
+            transition: all 0.5s ease;
+        }
+        
+        .uchiha .clan-title { top: 8%; }
+        .senju .clan-title { bottom: 8%; }
+        .expanded .clan-title { top: 5%; font-size: 1.8rem; }
+
+        /* =========================================
+           CARROSSEL DE PERSONAGENS GIRANDO (3D)
+        =========================================== */
+        .char-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .char {
+            position: absolute;
+            bottom: 0;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8));
+            transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Classes de posicionamento do Carrossel */
+        .pos-center {
+            left: 50%;
+            height: 85%;
+            transform: translateX(-50%) scale(1);
+            z-index: 3;
+            opacity: 1;
+        }
+
+        .pos-right {
+            left: 80%;
+            height: 65%;
+            transform: translateX(-50%) scale(0.9);
+            z-index: 2;
+            opacity: 0.6;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8)) brightness(0.6);
+        }
+
+        .pos-left {
+            left: 20%;
+            height: 65%;
+            transform: translateX(-50%) scale(0.9);
+            z-index: 2;
+            opacity: 0.6;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8)) brightness(0.6);
+        }
+
+        /* Quando o form abre, o personagem central sobe, os das bordas somem pro form não sobrepor */
+        .expanded .pos-center { transform: translateX(-50%) scale(1.1); margin-bottom: 25vh !important; }
+        .expanded .pos-left, .expanded .pos-right { opacity: 0; }
+
+        /* =========================================
+           PARTÍCULAS SEM GLOW, APENAS OPACIDADE
+        =========================================== */
+        .particle { position: absolute; pointer-events: none; z-index: 1; opacity: 0; }
+        /* Fogo matte */
+        .spark { background: rgba(255, 90, 90, 0.6); border-radius: 50%; bottom: 0; animation: flyUp linear infinite; }
+        /* Folhas matte */
+        .leaf { background: rgba(90, 255, 90, 0.6); border-radius: 0 50% 0 50%; top: 0; animation: fallDown linear infinite; }
+
+        @keyframes flyUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 20% { opacity: 0.8; } 100% { transform: translateY(-60vh) scale(0.2); opacity: 0; } }
+        @keyframes fallDown { 0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0; } 20% { opacity: 0.8; } 100% { transform: translateY(60vh) rotate(360deg) scale(0.2); opacity: 0; } }
+
+        /* =========================================
+           FORMULÁRIO GAVETA DARK MATTE
+        =========================================== */
+        .form-drawer {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: #0f0f0f;
+            padding: 25px 20px 40px 20px; border-radius: 25px 25px 0 0; z-index: 100;
+            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+        }
+        .form-drawer.show { transform: translateY(0); }
+        .drag-handle { width: 40px; height: 4px; background: #444; border-radius: 4px; margin: 0 auto 20px auto; }
+        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .form-header h2 { font-size: 1.4rem; color: #fff; }
+        .btn-voltar { background: none; border: none; color: #777; font-size: 0.9rem; text-decoration: underline; cursor: pointer; }
+        .input-group { margin-bottom: 18px; }
+        .input-group label { display: block; color: #aaa; margin-bottom: 5px; font-size: 12px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 15px; outline: none; transition: border 0.3s; }
+        .input-group input:focus { border-color: #666; }
+        .btn-submit { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: 'Poppins', sans-serif; text-transform: uppercase; cursor: pointer; margin-top: 10px; transition: filter 0.3s; color: white; }
+
+        /* Temas super sutis no Form */
+        .form-drawer.theme-uchiha { border-top: 2px solid #8b0000; }
+        .form-drawer.theme-uchiha .btn-submit { background: #8b0000; }
+        
+        .form-drawer.theme-senju { border-top: 2px solid #004d00; }
+        .form-drawer.theme-senju .btn-submit { background: #004d00; }
+
+        /* ==========================
+           MODAL DE BEM-VINDO IMERSIVO (Mobile-first)
+        ============================ */
+        .welcome-modal {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(120% 120% at 50% 20%, rgba(255,255,255,0.04), transparent 60%),
+                        linear-gradient(180deg, #090909 0%, #050505 100%);
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+            --accent: #8b0000;
+            --accent-soft: rgba(139, 0, 0, 0.35);
+        }
+        .welcome-modal[data-clan="senju"] { --accent: #1f7a2e; --accent-soft: rgba(31, 122, 46, 0.35); }
+        .welcome-modal.show { opacity: 1; pointer-events: auto; }
+        .welcome-modal::before,
+        .welcome-modal::after {
+            content: '';
+            position: absolute;
+            inset: -20%;
+            background: radial-gradient(40% 30% at 20% 30%, var(--accent-soft), transparent 60%),
+                        radial-gradient(30% 40% at 80% 70%, rgba(255,255,255,0.06), transparent 65%);
+            opacity: 0.6;
+            animation: drift 18s linear infinite;
+        }
+        .welcome-modal::after { animation-duration: 26s; opacity: 0.35; }
+        @keyframes drift {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            50% { transform: translate3d(-2%, -3%, 0) scale(1.02); }
+            100% { transform: translate3d(0, 0, 0) scale(1); }
+        }
+
+        .welcome-stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(20px, 6vw, 60px);
+        }
+
+        .welcome-card {
+            position: relative;
+            width: min(980px, 94%);
+            background: rgba(10,10,10,0.7);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 22px;
+            padding: clamp(20px, 5vw, 32px);
+            box-shadow: 0 30px 90px rgba(0,0,0,0.65);
+            backdrop-filter: blur(10px);
+            display: flex;
+            gap: 22px;
+            align-items: center;
+            justify-content: space-between;
+            color: #eee;
+            overflow: hidden;
+            transform-origin: center bottom;
+            flex-wrap: wrap;
+        }
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(45% 45% at 20% 10%, var(--accent-soft), transparent 60%),
+                        linear-gradient(120deg, rgba(255,255,255,0.06), transparent 40%);
+            opacity: 0.9;
+            pointer-events: none;
+        }
+        .welcome-crest {
+            position: absolute;
+            right: -70px;
+            top: -70px;
+            width: 220px;
+            height: 220px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            opacity: 0.35;
+            box-shadow: 0 0 0 10px rgba(255,255,255,0.02);
+        }
+        .welcome-left { display:flex; flex-direction:column; gap:8px; position: relative; z-index: 1; }
+        .welcome-left h1 { font-family: 'Cinzel', serif; font-size: clamp(2rem, 5vw, 3.2rem); color:#fff; margin:0; letter-spacing: 2px; text-transform: uppercase; }
+        .welcome-left h1 .welcome-kicker { display:block; font-size: 0.85rem; letter-spacing: 4px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+        .welcome-left h1 .welcome-name { color: #fff; text-shadow: 0 6px 16px rgba(0,0,0,0.55); }
+        .welcome-left p { font-family: 'Poppins', sans-serif; margin:0; color:#ddd; font-weight:600; }
+        .welcome-left .welcome-clan { color: var(--accent); font-weight: 700; }
+        .welcome-tagline { font-size: 0.95rem; color: rgba(255,255,255,0.7); }
+        .welcome-actions { display:flex; flex-direction:column; gap:10px; align-items:flex-end; position: relative; z-index: 1; }
+        .welcome-primary {
+            display:inline-block;
+            padding:12px 18px;
+            background: linear-gradient(135deg, var(--accent), #111 140%);
+            color:#fff;
+            border-radius:12px;
+            text-decoration:none;
+            font-weight:700;
+            border:1px solid rgba(255,255,255,0.08);
+        }
+        .welcome-close { background:transparent; border:1px solid rgba(255,255,255,0.12); color:#ddd; padding:8px 12px; border-radius:10px; cursor:pointer; }
+        .welcome-image { position: relative; z-index: 1; }
+        .welcome-image img { max-height: 320px; max-width: 220px; object-fit: contain; filter: drop-shadow(0 8px 20px rgba(0,0,0,0.5)); animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes popIn {
+            from { transform: translateY(18px) scale(.98); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .welcome-modal.show .welcome-card { animation: popIn 260ms cubic-bezier(.2,.9,.25,1); }
+        @media (max-width:720px) {
+            .welcome-card { flex-direction:column; text-align:center; }
+            .welcome-image { order: -1; }
+            .welcome-actions { align-items:center; width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Setas Neutras em SVG (Flechas de verdade) -->
+    <div class="center-arrows" id="center-arrows">
+        <!-- Flecha Cima -->
+        <svg class="arrow up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+        <!-- Flecha Baixo -->
+        <svg class="arrow down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+    </div>
+
+    <div class="container" id="main-container">
+        <!-- Lado UCHIHA -->
+        <div class="clan-box uchiha" onclick="escolherClan('uchiha')">
+            <h1 class="clan-title">Uchiha</h1>
+            <div class="char-container" id="uchiha-chars">
+                <img src="https://i.pinimg.com/originals/48/1e/15/481e1505a4db3db72e0760f27e13b73f.png" alt="Madara" class="char uchiha-img">
+                <img src="https://www.pngall.com/wp-content/uploads/14/Itachi-PNG-Photos.png" alt="Itachi" class="char uchiha-img">
+                <img src="https://www.pngkey.com/png/full/204-2041426_sasuke-uchiha-sasuke-seal-of-shadow.png" alt="Sasuke" class="char uchiha-img">
+            </div>
+        </div>
+
+        <!-- Lado SENJU -->
+        <div class="clan-box senju" onclick="escolherClan('senju')">
+            <h1 class="clan-title">Senju</h1>
+            <div class="char-container" id="senju-chars">
+                <img src="https://i.imgur.com/wLSI0Gg.png" alt="Hashirama" class="char senju-img">
+                <img src="https://i.pinimg.com/originals/6d/e2/59/6de259902e088c3d0bb1757ad2c8528a.png" alt="Tobirama" class="char senju-img">
+                <img src="https://i.ebayimg.com/images/g/~tUAAOSwUc1h3K88/s-l1200.png" alt="Tsunade" class="char senju-img">
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário que sobe -->
+    <div class="form-drawer" id="form-drawer">
+        <div class="drag-handle"></div>
+        <div class="form-header">
+            <h2 id="form-title">Registro</h2>
+            <button type="button" class="btn-voltar" onclick="voltarSelecao()">Trocar Clã</button>
+        </div>
+        <form id="rpg-form">
+            <input type="hidden" id="clan-input" name="clan">
+            <div class="input-group">
+                <label>Nome Shinobi</label>
+                <input type="text" id="nome" required placeholder="Digite seu nome">
+            </div>
+            <div class="input-group">
+                <label>WhatsApp</label>
+                <input type="tel" id="whatsapp" required placeholder="(00) 00000-0000" maxlength="15" oninput="formatWhatsApp(event)">
+            </div>
+            <div class="input-group">
+                <label>Senha da Carteira</label>
+                <input type="password" id="senha" required placeholder="Crie uma senha segura">
+            </div>
+            <button type="submit" class="btn-submit" id="btn-submit">Confirmar Registro</button>
+        </form>
+    </div>
+
+    <!-- Modal de confirmação (aparece após submit bem-sucedido) -->
+    <div id="welcome-modal" class="welcome-modal" role="dialog" aria-hidden="true">
+        <div class="welcome-stage">
+            <div class="welcome-card">
+                <div class="welcome-crest" aria-hidden="true"></div>
+                <div class="welcome-left">
+                    <h1>
+                        <span class="welcome-kicker">Bem-vindo</span>
+                        <span id="welcome-name" class="welcome-name">Shinobi</span>
+                    </h1>
+                    <p>Sua jornada no clã <span id="welcome-clan" class="welcome-clan">-</span> começa agora.</p>
+                    <p class="welcome-tagline">Respire fundo. Sinta o legado. Avance.</p>
+                </div>
+                <div class="welcome-image">
+                    <img id="ninja-image" src="https://pt.quizur.com/_image?href=https://img.quizur.com/f/img5d99e1bc199602.72036525.png?lastEdited=1570365888&w=600&h=600&f=webp" alt="Ninja">
+                </div>
+                <div class="welcome-actions">
+                    <button id="welcome-start" class="welcome-primary">Iniciar Jornada</button>
+                    <button id="close-welcome-modal" class="welcome-close">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================
+           LÓGICA DO CARROSSEL 3D
+        =========================================== */
+        const uchihaImages = document.querySelectorAll('.uchiha-img');
+        const senjuImages = document.querySelectorAll('.senju-img');
+        
+        // Posições no ciclo (Centro, Direita, Esquerda)
+        const posicoes = ['pos-center', 'pos-right', 'pos-left'];
+        let currentIndex = 0;
+
+        function renderizarCarrossel() {
+            uchihaImages.forEach((img, i) => {
+                // Atribui a classe de posição baseada no índice atual
+                img.className = 'char uchiha-img ' + posicoes[(i + currentIndex) % 3];
+            });
+            senjuImages.forEach((img, i) => {
+                img.className = 'char senju-img ' + posicoes[(i + currentIndex) % 3];
+            });
+        }
+
+        // Configura as posições iniciais
+        renderizarCarrossel();
+
+        // Gira o carrossel movendo as posições a cada 4 segundos
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % 3;
+            renderizarCarrossel();
+        }, 4000);
+
+
+        /* =========================================
+           PARTÍCULAS SUTIS
+        =========================================== */
+        function criarParticulas() {
+            const uchihaDiv = document.querySelector('.uchiha');
+            const senjuDiv = document.querySelector('.senju');
+
+            for (let i = 0; i < 20; i++) { 
+                let spark = document.createElement('div');
+                spark.className = 'particle spark';
+                spark.style.left = Math.random() * 100 + '%';
+                spark.style.width = Math.random() * 4 + 2 + 'px';
+                spark.style.height = spark.style.width;
+                spark.style.animationDuration = Math.random() * 4 + 3 + 's';
+                spark.style.animationDelay = Math.random() * 3 + 's';
+                uchihaDiv.appendChild(spark);
+            }
+
+            for (let i = 0; i < 20; i++) { 
+                let leaf = document.createElement('div');
+                leaf.className = 'particle leaf';
+                leaf.style.left = Math.random() * 100 + '%';
+                leaf.style.width = Math.random() * 5 + 3 + 'px';
+                leaf.style.height = leaf.style.width;
+                leaf.style.animationDuration = Math.random() * 5 + 4 + 's';
+                leaf.style.animationDelay = Math.random() * 3 + 's';
+                senjuDiv.appendChild(leaf);
+            }
+        }
+        window.onload = criarParticulas;
+
+        /* =========================================
+           INTERAÇÕES DE INTERFACE E FORMULÁRIO
+        =========================================== */
+        const formDrawer = document.getElementById('form-drawer');
+        const boxUchiha = document.querySelector('.uchiha');
+        const boxSenju = document.querySelector('.senju');
+        const centerArrows = document.getElementById('center-arrows');
+        const inputClan = document.getElementById('clan-input');
+        const formTitle = document.getElementById('form-title');
+        const btnSubmit = document.getElementById('btn-submit');
+
+        function escolherClan(clan) {
+            centerArrows.style.opacity = '0';
+            
+            if(clan === 'uchiha') {
+                boxUchiha.classList.add('expanded');
+                boxSenju.classList.add('collapsed');
+                formDrawer.className = 'form-drawer theme-uchiha show';
+                formTitle.innerText = 'Clã Uchiha';
+                btnSubmit.innerText = 'Avançar';
+                inputClan.value = 'uchiha';
+            } else {
+                boxSenju.classList.add('expanded');
+                boxUchiha.classList.add('collapsed');
+                formDrawer.className = 'form-drawer theme-senju show';
+                formTitle.innerText = 'Clã Senju';
+                btnSubmit.innerText = 'Avançar';
+                inputClan.value = 'senju';
+            }
+        }
+
+        function voltarSelecao() {
+            formDrawer.className = 'form-drawer';
+            boxUchiha.classList.remove('expanded', 'collapsed');
+            boxSenju.classList.remove('expanded', 'collapsed');
+            centerArrows.style.opacity = '1';
+        }
+
+        function formatWhatsApp(event) {
+            let input = event.target;
+            let v = input.value.replace(/\D/g, ''); 
+            if (v.length > 11) v = v.slice(0, 11); 
+            let formatted = v;
+            if (v.length > 2) formatted = `(${v.slice(0, 2)}) ${v.slice(2)}`;
+            if (v.length > 7) formatted = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
+            input.value = formatted;
+        }
+
+        document.getElementById('rpg-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            btnSubmit.innerText = 'Validando...';
+
+            const payload = {
+                username: document.getElementById('nome').value.trim(),
+                whatsapp: document.getElementById('whatsapp').value.trim(),
+                password: document.getElementById('senha').value,
+                clan: inputClan.value,
+                profile_pic: '',
+            };
+
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then(async (response) => {
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Nao foi possivel concluir o cadastro.');
+                    }
+
+                    const username = payload.username || document.getElementById('nome').value.trim();
+
+                    if (username) {
+                        localStorage.setItem('walletUsername', username);
+                        window.location.href = `/wallet?username=${encodeURIComponent(username)}`;
+                        return;
+                    }
+
+                    const clanName = inputClan.value ? inputClan.value.toUpperCase() : '';
+                    showWelcomeModal(username, clanName, '#');
+                    btnSubmit.innerText = 'Concluido';
+                    return data;
+                })
+                .catch((error) => {
+                    alert(error.message);
+                    btnSubmit.innerText = 'Confirmar Registro';
+                });
+        });
+
+        /* Modal pós-submit */
+        function showWelcomeModal(name, clan, ninjaUrl){
+            const modal = document.getElementById('welcome-modal');
+            document.getElementById('welcome-name').innerText = name || 'Bem-vindo!';
+            document.getElementById('welcome-clan').innerText = clan || '-';
+            modal.dataset.clan = (inputClan.value || '').toLowerCase();
+            if (ninjaUrl && ninjaUrl !== '#') {
+                document.getElementById('ninja-image').src = ninjaUrl;
+            }
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden','false');
+        }
+
+        function closeWelcomeModal() {
+            const modal = document.getElementById('welcome-modal');
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden','true');
+        }
+
+        document.getElementById('close-welcome-modal').addEventListener('click', closeWelcomeModal);
+        document.getElementById('welcome-start').addEventListener('click', closeWelcomeModal);
+    </script>
+</body>
+</html>

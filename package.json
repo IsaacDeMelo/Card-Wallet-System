@@ -1,0 +1,26 @@
+{
+  "name": "cardwallet",
+  "version": "1.0.0",
+  "description": "Card Wallet com carteira, painel admin e deploy pronto para Render.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.2",
+    "dotenv": "^17.2.0",
+    "ejs": "^5.0.2",
+    "express": "^5.2.1",
+    "git": "^0.1.5",
+    "mongoose": "^8.17.0"
+  }
+}
