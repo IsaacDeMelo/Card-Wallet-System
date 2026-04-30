@@ -6,451 +6,269 @@
   <title>Admin Lite - Card Wallet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #06110b;
-      --panel: rgba(10, 20, 14, 0.82);
-      --panel-2: rgba(15, 26, 18, 0.88);
-      --line: rgba(255, 255, 255, 0.08);
+      --bg-dark: #06110b;
+      --panel: rgba(10, 20, 14, 0.6);
+      --panel-2: rgba(15, 26, 18, 0.8);
+      --line: rgba(74, 222, 128, 0.2);
       --text: #f4f7f5;
       --muted: #9fb0a4;
       --accent: #4ade80;
-      --accent-2: #22c55e;
+      --accent-glow: rgba(74, 222, 128, 0.4);
       --danger: #ef4444;
-      --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      --danger-glow: rgba(239, 68, 68, 0.4);
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #1f3d2a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
     body {
-      min-height: 100vh;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(74, 222, 128, 0.13), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.12), transparent 28%),
-        linear-gradient(180deg, #040805 0%, #08110c 100%);
-      overflow-x: hidden;
+      min-height: 100vh; color: var(--text); background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 0% 0%, rgba(74, 222, 128, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(34, 197, 94, 0.05) 0%, transparent 40%);
+      background-attachment: fixed; overflow-x: hidden;
     }
 
-    .shell {
-      width: min(1200px, calc(100vw - 32px));
-      margin: 0 auto;
-      padding: 22px 0 40px;
-      display: grid;
-      gap: 18px;
+    .shell { width: min(1200px, 92vw); margin: 0 auto; padding: 32px 0 60px; display: flex; flex-direction: column; gap: 24px; }
+
+    /* Painéis e Cards */
+    .hero, .auth-box, .panel, .stat {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 20px;
+      backdrop-filter: blur(12px); box-shadow: var(--shadow);
     }
 
-    .hero {
-      background: linear-gradient(180deg, rgba(12, 20, 14, 0.92), rgba(7, 13, 9, 0.9));
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 20px;
-      display: grid;
-      gap: 14px;
-    }
+    .hero { padding: 24px; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden; }
+    .hero::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
 
-    .eyebrow {
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-      color: var(--accent);
-      font-size: 0.72rem;
-      font-weight: 700;
-    }
+    .eyebrow { text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-size: 0.8rem; font-weight: 800; }
+    h1 { font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 4vw, 2.5rem); color: #fff; text-shadow: 0 0 20px var(--accent-glow); }
+    .subtitle { color: var(--muted); font-size: 0.95rem; max-width: 800px; }
 
-    h1 {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(1.7rem, 4vw, 2.6rem);
-      line-height: 1;
-    }
+    .hero-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+    
+    .pill { padding: 6px 14px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); font-size: 0.85rem; font-weight: 600; }
 
-    .subtitle {
-      color: var(--muted);
-      max-width: 72ch;
-      line-height: 1.5;
-      font-size: 0.95rem;
+    /* Inputs e Botões */
+    .field, select {
+      width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.4); color: #fff; outline: none; transition: all 0.3s; font-size: 0.95rem;
     }
-
-    .hero-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .pill {
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--line);
-      color: var(--text);
-      font-size: 0.82rem;
-    }
-
-    .auth-box,
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-    }
-
-    .auth-box {
-      padding: 18px;
-    }
-
-    .auth-row {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: 1fr auto;
-    }
-
-    .field {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.22);
-      color: var(--text);
-      outline: none;
-      font-size: 0.98rem;
-    }
-
-    .field:focus {
-      border-color: rgba(74, 222, 128, 0.55);
-      box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.08);
-    }
+    .field:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2); }
+    select option { background: var(--bg-dark); color: #fff; }
 
     .btn {
-      border: none;
-      border-radius: 14px;
-      padding: 14px 16px;
-      cursor: pointer;
-      font-weight: 700;
-      transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 0.9rem;
+      border: 1px solid transparent; cursor: pointer; transition: all 0.2s;
     }
+    .btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    
+    .btn.primary { background: var(--accent); color: #000; box-shadow: 0 4px 15px var(--accent-glow); }
+    .btn.primary:hover { filter: brightness(1.1); box-shadow: 0 6px 20px var(--accent-glow); }
+    .btn.secondary { background: rgba(255,255,255,0.05); color: #fff; border-color: var(--line); }
+    .btn.secondary:hover { background: rgba(255,255,255,0.1); }
+    .btn.danger { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
+    .btn.danger:hover { background: rgba(239, 68, 68, 0.2); box-shadow: 0 4px 15px var(--danger-glow); }
 
-    .btn:hover { transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
+    .status { font-size: 0.95rem; font-weight: 600; padding: 8px 12px; border-radius: 8px; margin-top: 10px; display: inline-block; }
+    .status.ok { color: var(--accent); background: rgba(74, 222, 128, 0.1); }
+    .status.error { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+    .status.warn { color: #fcd34d; background: rgba(252, 211, 77, 0.1); }
 
-    .btn.primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #041008;
-    }
+    .auth-box { padding: 24px; max-width: 500px; margin: 0 auto; width: 100%; }
+    .auth-row { display: flex; gap: 12px; }
 
-    .btn.secondary {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text);
-      border: 1px solid var(--line);
-    }
+    /* Grid e Layout Interno */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat { padding: 20px; text-align: center; }
+    .stat p { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+    .stat h3 { font-size: 2rem; font-family: 'Cinzel', serif; color: var(--accent); margin-top: 8px; }
 
-    .status {
-      color: var(--muted);
-      font-size: 0.92rem;
-      min-height: 1.2em;
-    }
+    .workspace { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+    @media(max-width: 900px) { .workspace { grid-template-columns: 1fr; } }
 
-    .status.ok { color: var(--accent); }
-    .status.error { color: #fca5a5; }
-    .status.warn { color: #fcd34d; }
+    .panel { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; }
+    .panel-head h2 { font-size: 1.2rem; font-weight: 700; color: #fff; }
 
-    .top-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+    /* Criação Rápida */
+    .create-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .create-grid .full { grid-column: 1 / -1; }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-    }
+    .list { display: grid; gap: 12px; max-height: 600px; overflow-y: auto; padding-right: 4px; }
+    .card-item { padding: 16px; border-radius: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); transition: border 0.3s; }
+    .card-item:hover { border-color: rgba(255,255,255,0.15); }
 
-    .stat {
-      padding: 16px;
-      border-radius: 18px;
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-    }
+    .card-item h3 { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .muted { color: var(--muted); font-size: 0.85rem; }
 
-    .stat p {
-      color: var(--muted);
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 6px;
-    }
+    .user-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .badge { padding: 4px 10px; border-radius: 6px; background: rgba(74, 222, 128, 0.1); border: 1px solid var(--accent); color: var(--accent); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+    
+    .user-cards { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .user-card { padding: 4px 10px; border-radius: 8px; background: rgba(255,255,255,0.05); font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 6px; }
 
-    .stat h3 {
-      font-size: 1.4rem;
-      line-height: 1;
-    }
-
-    .workspace {
-      display: grid;
-      grid-template-columns: 0.78fr 1.22fr;
-      gap: 18px;
-      align-items: start;
-    }
-
-    .panel {
-      padding: 18px;
-    }
-
-    .panel-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .panel-head h2 {
-      font-size: 1.08rem;
-      font-weight: 800;
-    }
-
-    .search {
-      width: 100%;
-      margin-bottom: 14px;
-    }
-
-    .list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .card-item {
-      padding: 14px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .card-item h3 {
-      font-size: 0.98rem;
-      line-height: 1.3;
-      word-break: break-word;
-    }
-
-    .card-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
-
-    .card-actions .btn {
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-size: 0.82rem;
-    }
-
-    .btn.danger {
-      background: rgba(239, 68, 68, 0.14);
-      color: #fecaca;
-      border: 1px solid rgba(239, 68, 68, 0.25);
-    }
-
-    .muted {
-      color: var(--muted);
-      font-size: 0.86rem;
-    }
-
-    .user-head {
-      display: grid;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-
-    .user-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(74, 222, 128, 0.08);
-      border: 1px solid rgba(74, 222, 128, 0.14);
-      color: #b7f7cb;
-      font-size: 0.76rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .user-cards {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .user-card {
-      padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(0, 0, 0, 0.2);
-      font-size: 0.84rem;
-      color: var(--text);
-      word-break: break-word;
-    }
-
-    .empty {
-      padding: 18px;
-      border-radius: 16px;
-      border: 1px dashed rgba(255, 255, 255, 0.14);
-      color: var(--muted);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
+    .empty { padding: 30px; text-align: center; border-radius: 16px; border: 2px dashed rgba(255,255,255,0.1); color: var(--muted); }
     .hidden { display: none !important; }
 
-    @media (max-width: 900px) {
-      .workspace {
-        grid-template-columns: 1fr;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+    /* Estilos do Modal de Usuário */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+      display: flex; justify-content: center; align-items: center; z-index: 1000;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 20px;
     }
-
-    @media (max-width: 620px) {
-      .shell {
-        width: min(100vw - 20px, 1200px);
-        padding-top: 12px;
-      }
-
-      .hero,
-      .auth-box,
-      .panel {
-        border-radius: 18px;
-      }
-
-      .auth-row {
-        grid-template-columns: 1fr;
-      }
-
-      .top-actions {
-        width: 100%;
-      }
-
-      .top-actions .btn {
-        flex: 1 1 0;
-      }
-
-      .stats {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .user-top {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-content {
+      background: var(--bg-dark); border: 1px solid var(--accent); border-radius: 20px;
+      width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 24px;
+      box-shadow: 0 0 50px rgba(74, 222, 128, 0.15); display: flex; flex-direction: column; gap: 20px;
     }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+    .modal-header h2 { font-size: 1.5rem; color: #fff; font-family: 'Cinzel', serif; margin-bottom: 4px; }
+    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; padding: 4px; }
+    .modal-close:hover { color: #fff; }
+    
+    .modal-section { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; }
+    .modal-section h4 { color: var(--accent); margin-bottom: 12px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+    
+    .inventory-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
+    .inventory-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+    .inventory-actions { display: flex; gap: 8px; }
+    .btn-icon { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; border-radius: 6px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; font-weight: bold;}
+    .btn-icon:hover { background: rgba(239, 68, 68, 0.3); }
+
+    .add-card-row { display: flex; gap: 8px; align-items: center; }
   </style>
 </head>
 <body>
   <main class="shell">
     <section class="hero">
-      <div class="eyebrow">Admin Lite</div>
+      <div class="eyebrow">Modo Administrador (Lite)</div>
       <div>
-        <h1>Biblioteca e usuários</h1>
-        <p class="subtitle">Painel somente leitura para consultar todas as cartas cadastradas e ver cada usuário com WhatsApp, clã e a lista de cartas que ele possui, mostrando apenas o nome das cartas.</p>
+        <h1>Biblioteca Ninja</h1>
+        <p class="subtitle">Visão simplificada para consulta de usuários, criação rápida de cartas base e gerenciamento ágil de inventários.</p>
       </div>
       <div class="hero-row">
         <div class="pill-row">
-          <span class="pill">Consulta rápida</span>
-          <span class="pill">Usuários detalhados</span>
-          <span class="pill">Cartas por nome</span>
+          <span class="pill">Consulta Global</span>
+          <span class="pill">Criação Rápida</span>
         </div>
-        <div class="top-actions">
-          <button class="btn secondary" id="refreshBtn" type="button">Atualizar</button>
-          <button class="btn secondary" id="goWalletBtn" type="button">Wallet</button>
-          <button class="btn secondary" id="logoutBtn" type="button">Sair</button>
+        <div class="hero-row" style="gap: 8px;">
+          <button class="btn secondary" id="refreshBtn"><svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>Atualizar</button>
+          <button class="btn secondary" id="goWalletBtn"><svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Wallet</button>
+          <button class="btn danger" id="logoutBtn"><svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>Sair</button>
         </div>
       </div>
     </section>
 
     <section class="auth-box" id="authBox">
       <div class="auth-row">
-        <input class="field" id="passwordInput" type="password" placeholder="Senha admin-lite" autocomplete="current-password" />
-        <button class="btn primary" id="unlockBtn" type="button">Entrar</button>
+        <input class="field" id="passwordInput" type="password" placeholder="Senha admin-lite..." autocomplete="current-password" />
+        <button class="btn primary" id="unlockBtn">Acessar</button>
       </div>
       <p class="status" id="statusText"></p>
     </section>
 
     <section id="content" class="hidden">
-      <div class="stats" style="margin-bottom: 18px;">
-        <article class="stat">
-          <p>Cartas</p>
-          <h3 id="cardsCount">0</h3>
-        </article>
-        <article class="stat">
-          <p>Usuários</p>
-          <h3 id="usersCount">0</h3>
-        </article>
-        <article class="stat">
-          <p>Usuários com cartas</p>
-          <h3 id="ownersCount">0</h3>
-        </article>
-        <article class="stat">
-          <p>Cartas atribuídas</p>
-          <h3 id="ownedCardsCount">0</h3>
-        </article>
+      <div class="stats">
+        <article class="stat"><p>Total de Cartas</p><h3 id="cardsCount">0</h3></article>
+        <article class="stat"><p>Usuários Registrados</p><h3 id="usersCount">0</h3></article>
+        <article class="stat"><p>Colecionadores Ativos</p><h3 id="ownersCount">0</h3></article>
+        <article class="stat"><p>Volume na Economia</p><h3 id="ownedCardsCount">0</h3></article>
       </div>
 
+      <!-- Seção de Criação Rápida -->
+      <section class="panel" style="margin-bottom: 24px;">
+        <div class="panel-head">
+          <h2>Criar Carta Rápida</h2>
+          <span class="badge">Apenas Base</span>
+        </div>
+        <p class="muted" style="margin-top:-8px; margin-bottom:8px;">A carta será criada vazia no banco. Imagens e textos avançados são geridos em Forja Avançada.</p>
+        <div class="create-grid">
+          <input type="text" id="liteCardId" class="field" placeholder="ID da Carta (ex: jutsu001)" />
+          <input type="text" id="liteCategoria" class="field" placeholder="Raridade/Categoria (ex: Lenda, Fogo)" />
+          <input type="text" id="liteTitle" class="field full" placeholder="Nome da Carta (ex: Bola de Fogo)" />
+          <button class="btn primary full" id="liteCreateBtn">Forjar Carta no Sistema</button>
+        </div>
+        <p class="status hidden" id="liteCreateStatus"></p>
+      </section>
+
       <div class="workspace">
+        <!-- Lista de Cartas -->
         <section class="panel">
           <div class="panel-head">
-            <h2>Biblioteca de cartas</h2>
-            <span class="badge" id="cardsVisible">0 visíveis</span>
+            <h2>Acervo Global</h2>
+            <span class="badge" id="cardsVisible">0</span>
           </div>
-          <input class="field search" id="cardSearch" placeholder="Buscar carta pelo nome" />
+          <input class="field" id="cardSearch" placeholder="Pesquisar carta..." />
           <div class="list" id="cardsList"></div>
         </section>
 
+        <!-- Lista de Usuários -->
         <section class="panel">
           <div class="panel-head">
-            <h2>Usuários</h2>
-            <span class="badge" id="usersVisible">0 visíveis</span>
+            <h2>Shinobis</h2>
+            <span class="badge" id="usersVisible">0</span>
           </div>
-          <input class="field search" id="userSearch" placeholder="Buscar usuário, WhatsApp, clã ou carta" />
+          <input class="field" id="userSearch" placeholder="Pesquisar por nome, clã ou carta..." />
           <div class="list" id="usersList"></div>
         </section>
       </div>
     </section>
   </main>
 
-  <script>
-    const ADMIN_LITE_PASSWORD = 'adminrpg090920201010';
+  <!-- Modal de Perfil do Usuário -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h2 id="modalUserName">Nome do Usuário</h2>
+          <p class="muted" id="modalUserInfo">Clã: --- | Zap: ---</p>
+        </div>
+        <button class="modal-close" id="closeModalBtn">
+          <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
 
+      <!-- Inventário Atual -->
+      <div class="modal-section">
+        <h4>Bolsa Ninja (Cartas do Usuário)</h4>
+        <div class="inventory-list" id="modalInventoryList">
+          <!-- Preenchido via JS -->
+        </div>
+      </div>
+
+      <!-- Adicionar Carta -->
+      <div class="modal-section">
+        <h4>Entregar Nova Carta</h4>
+        <div class="add-card-row">
+          <select id="modalCardSelect" class="field" style="flex: 2;"></select>
+          <input type="number" id="modalCardQtd" class="field" style="flex: 1;" min="1" value="1" placeholder="Qtd" />
+          <button class="btn primary" id="modalAddCardBtn" style="flex: 1;">Dar Carta</button>
+        </div>
+        <p class="status hidden" id="modalActionStatus" style="margin-top: 8px; font-size: 0.8rem;"></p>
+      </div>
+
+      <!-- Zona de Perigo -->
+      <div class="modal-section" style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05);">
+        <h4 style="color: var(--danger);">Zona de Perigo</h4>
+        <p class="muted" style="margin-bottom: 12px; font-size: 0.85rem;">Excluir um usuário apaga ele do banco de dados permanentemente.</p>
+        <button class="btn danger full" id="modalDeleteUserBtn" style="width: 100%;">Excluir Usuário Permanentemente</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Referências DOM - Base
     const authBox = document.getElementById('authBox');
     const content = document.getElementById('content');
     const statusText = document.getElementById('statusText');
@@ -459,6 +277,8 @@
     const refreshBtn = document.getElementById('refreshBtn');
     const goWalletBtn = document.getElementById('goWalletBtn');
     const logoutBtn = document.getElementById('logoutBtn');
+    
+    // Referências DOM - Listas e Status
     const cardSearch = document.getElementById('cardSearch');
     const userSearch = document.getElementById('userSearch');
     const cardsList = document.getElementById('cardsList');
@@ -470,238 +290,415 @@
     const cardsVisible = document.getElementById('cardsVisible');
     const usersVisible = document.getElementById('usersVisible');
 
-    let adminPassword = '';
-    let overviewData = { cards: [], users: [] };
+    // Referências DOM - Criação Lite
+    const liteCardId = document.getElementById('liteCardId');
+    const liteCategoria = document.getElementById('liteCategoria');
+    const liteTitle = document.getElementById('liteTitle');
+    const liteCreateBtn = document.getElementById('liteCreateBtn');
+    const liteCreateStatus = document.getElementById('liteCreateStatus');
 
+    // Referências DOM - Modal Usuário
+    const userModal = document.getElementById('userModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modalUserName = document.getElementById('modalUserName');
+    const modalUserInfo = document.getElementById('modalUserInfo');
+    const modalInventoryList = document.getElementById('modalInventoryList');
+    const modalCardSelect = document.getElementById('modalCardSelect');
+    const modalCardQtd = document.getElementById('modalCardQtd');
+    const modalAddCardBtn = document.getElementById('modalAddCardBtn');
+    const modalDeleteUserBtn = document.getElementById('modalDeleteUserBtn');
+    const modalActionStatus = document.getElementById('modalActionStatus');
+
+    let adminPassword = '';
+    let overviewData = { cards: [], users:[] };
+    let currentModalUser = null; // Guarda o usuário que está aberto no modal
+
+    // Utilitários
     function escapeHtml(value) {
-      return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+      return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
-    function setStatus(message, type) {
-      statusText.textContent = message;
-      statusText.className = 'status';
-      if (type) {
-        statusText.classList.add(type);
+    function setStatus(message, type, el = statusText) {
+      el.textContent = message;
+      el.className = 'status';
+      if (type) el.classList.add(type);
+      el.classList.remove('hidden');
+      if(el !== statusText) { // Autoclear custom status
+          setTimeout(() => el.classList.add('hidden'), 4000);
       }
     }
 
     function getHeaders() {
-      return {
-        'Content-Type': 'application/json',
-        'x-admin-password': adminPassword,
-      };
+      return { 'Content-Type': 'application/json', 'x-admin-password': adminPassword };
     }
 
+    // Carregamento Central de Dados
     async function fetchOverview() {
-      const response = await fetch('/api/admin-lite/overview', {
-        headers: getHeaders(),
-      });
-
+      const response = await fetch('/api/admin-lite/overview', { headers: getHeaders() });
       const data = await response.json();
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || 'Falha ao carregar o painel.');
-      }
-
+      if (!response.ok || !data.success) throw new Error(data.message || 'Falha ao carregar dados do servidor.');
       return data;
     }
 
     function countOwnedCards(users) {
       return users.reduce((total, user) => {
-        const cards = Array.isArray(user.cards) ? user.cards : [];
+        const cards = Array.isArray(user.cards) ? user.cards :[];
         return total + cards.reduce((sum, entry) => sum + (Number(entry.quantity) || 0), 0);
       }, 0);
     }
 
+    async function loadData() {
+      setStatus('Sincronizando banco de dados...', '', statusText);
+      try {
+        const data = await fetchOverview();
+        overviewData = { 
+            cards: Array.isArray(data.cards) ? data.cards :[], 
+            users: Array.isArray(data.users) ? data.users :[] 
+        };
+        
+        // Atualiza Stats Superiores
+        cardsCount.textContent = overviewData.cards.length;
+        usersCount.textContent = overviewData.users.length;
+        ownersCount.textContent = overviewData.users.filter((u) => Array.isArray(u.cards) && u.cards.length > 0).length;
+        ownedCardsCount.textContent = countOwnedCards(overviewData.users);
+        
+        renderCards(); 
+        renderUsers();
+        
+        // Se o modal estiver aberto, atualiza a visão dele com os dados frescos
+        if(currentModalUser) {
+            const updatedUser = overviewData.users.find(u => u.username === currentModalUser.username);
+            if(updatedUser) {
+                openUserModal(updatedUser.username); // Re-renderiza o modal
+            } else {
+                closeModal(); // Usuário foi deletado ou não existe mais
+            }
+        }
+        statusText.classList.add('hidden');
+      } catch (err) {
+        setStatus(err.message, 'error');
+      }
+    }
+
+    // --- RENDERIZAÇÃO E LÓGICA DE CARTAS GLOBAIS ---
     function renderCards() {
       const search = cardSearch.value.trim().toLowerCase();
-      const cards = overviewData.cards.filter((card) => {
-        const title = String(card.title || '').toLowerCase();
-        return title.includes(search);
-      });
+      const cards = overviewData.cards.filter((card) => String(card.title || '').toLowerCase().includes(search) || String(card.cardId || '').toLowerCase().includes(search));
 
-      cardsVisible.textContent = `${cards.length} visíveis`;
+      cardsVisible.textContent = `${cards.length} cartas`;
 
       if (!cards.length) {
-        cardsList.innerHTML = '<div class="empty">Nenhuma carta encontrada.</div>';
+        cardsList.innerHTML = '<div class="empty">Nenhuma carta encontrada no acervo.</div>';
         return;
       }
 
       cardsList.innerHTML = cards.map((card) => `
         <article class="card-item">
-          <h3>${escapeHtml(card.title)}</h3>
-          <div class="card-actions">
-            <button class="btn danger delete-card-btn" type="button" data-card-id="${escapeHtml(card.cardId)}">Excluir carta</button>
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <h3>${escapeHtml(card.title)}</h3>
+            <span class="badge" style="background:transparent;">#${escapeHtml(card.cardId)}</span>
+          </div>
+          <p class="muted">Cat: ${escapeHtml(card.categoria || 'N/A')}</p>
+          <div style="margin-top: 12px;">
+            <button class="btn danger delete-card-btn" style="padding:6px 12px; font-size:0.8rem;" data-card-id="${escapeHtml(card.cardId)}">
+               Excluir Carta do BD
+            </button>
           </div>
         </article>
       `).join('');
     }
 
     async function deleteCard(cardId) {
-      if (!cardId) {
-        return;
+      if (!cardId || !window.confirm(`ATENÇÃO: Excluir a carta [${cardId}] do banco? Todos os usuários que possuem ela irão perdê-la.`)) return;
+      setStatus('Excluindo do BD...', '', statusText);
+      try {
+        const response = await fetch(`/api/admin-lite/cards/${encodeURIComponent(cardId)}`, { method: 'DELETE', headers: getHeaders() });
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.message || 'Falha ao excluir.');
+        setStatus(data.message || 'Excluída com sucesso.', 'ok', statusText);
+        await loadData();
+      } catch(err) {
+        setStatus(err.message, 'error', statusText);
       }
-
-      const confirmed = window.confirm(`Excluir a carta ${cardId}? Isso também remove ela de todos os usuários.`);
-      if (!confirmed) {
-        return;
-      }
-
-      setStatus('Excluindo carta...', '');
-
-      const response = await fetch(`/api/admin-lite/cards/${encodeURIComponent(cardId)}`, {
-        method: 'DELETE',
-        headers: getHeaders(),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || 'Falha ao excluir a carta.');
-      }
-
-      setStatus(data.message || 'Carta excluída.', 'ok');
-      await loadData();
     }
 
+    // Criação de Carta Base Lite
+    liteCreateBtn.addEventListener('click', async () => {
+      const cardId = liteCardId.value.trim();
+      const title = liteTitle.value.trim();
+      const categoria = liteCategoria.value.trim();
+
+      if (!cardId || !title || !categoria) {
+        setStatus('Preencha ID, Categoria e Nome.', 'warn', liteCreateStatus); return;
+      }
+
+      setStatus('Forjando no banco...', '', liteCreateStatus);
+      try {
+        // Usa a rota principal ou lite para injetar a carta
+        const response = await fetch('/api/admin/cards', { // Ajuste se seu backend usa rota diferente
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify({ adminPassword, cardId, title, categoria, draw: "", url: "" })
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.message || 'Falha ao criar carta.');
+
+        setStatus(`Carta ${title} forjada!`, 'ok', liteCreateStatus);
+        liteCardId.value = ''; liteTitle.value = ''; liteCategoria.value = '';
+        await loadData();
+      } catch (err) {
+        setStatus(err.message, 'error', liteCreateStatus);
+      }
+    });
+
+    // --- RENDERIZAÇÃO E LÓGICA DE USUÁRIOS ---
     function renderUsers() {
       const search = userSearch.value.trim().toLowerCase();
       const users = overviewData.users.filter((user) => {
         const username = String(user.username || '').toLowerCase();
-        const whatsapp = String(user.whatsapp || '').toLowerCase();
         const clan = String(user.clan || '').toLowerCase();
-        const cardText = (Array.isArray(user.cards) ? user.cards : []).map((entry) => String(entry.title || '').toLowerCase()).join(' ');
-        return [username, whatsapp, clan, cardText].join(' ').includes(search);
+        return username.includes(search) || clan.includes(search);
       });
 
-      usersVisible.textContent = `${users.length} visíveis`;
+      usersVisible.textContent = `${users.length} usuários`;
 
       if (!users.length) {
-        usersList.innerHTML = '<div class="empty">Nenhum usuário encontrado.</div>';
+        usersList.innerHTML = '<div class="empty">Nenhum shinobi encontrado.</div>';
         return;
       }
 
       usersList.innerHTML = users.map((user) => {
-        const cards = Array.isArray(user.cards) ? user.cards : [];
+        const cards = Array.isArray(user.cards) ? user.cards :[];
         return `
           <article class="card-item">
-            <div class="user-head">
-              <div class="user-top">
-                <h3>${escapeHtml(user.username)}</h3>
-                <span class="badge">${escapeHtml(String(user.clan || '-').toUpperCase())}</span>
+            <div class="user-top">
+              <div>
+                <h3 style="color:#fff; font-size:1.1rem;">${escapeHtml(user.username)}</h3>
+                <p class="muted" style="font-size:0.8rem;">Zap: ${escapeHtml(user.whatsapp || '-')}</p>
               </div>
-              <p class="muted">WhatsApp: ${escapeHtml(user.whatsapp || '-')}</p>
+              <button class="btn secondary manage-user-btn" data-username="${escapeHtml(user.username)}" style="padding: 6px 12px; font-size: 0.8rem; border-color: var(--accent); color: var(--accent);">
+                Gerenciar Perfil
+              </button>
             </div>
             <div class="user-cards">
               ${cards.length
-                ? cards.map((entry) => `<span class="user-card">${escapeHtml(entry.title)}${entry.quantity > 1 ? ` x${escapeHtml(entry.quantity)}` : ''}</span>`).join('')
-                : '<span class="muted">Sem cartas atribuídas</span>'}
+                ? cards.map((entry) => `<span class="user-card">${escapeHtml(entry.title)} <span style="color:var(--accent); font-weight:900;">x${escapeHtml(entry.quantity)}</span></span>`).join('')
+                : '<span class="muted" style="padding:4px 0;">Bolsa Vazia (Nenhuma carta)</span>'}
             </div>
           </article>
         `;
       }).join('');
     }
 
-    function renderStats() {
-      const users = Array.isArray(overviewData.users) ? overviewData.users : [];
-      const cards = Array.isArray(overviewData.cards) ? overviewData.cards : [];
-      const owners = users.filter((user) => Array.isArray(user.cards) && user.cards.length > 0).length;
+    // --- LÓGICA DO MODAL DE USUÁRIO ---
+    function openUserModal(username) {
+      const user = overviewData.users.find(u => u.username === username);
+      if(!user) return;
+      currentModalUser = user;
 
-      cardsCount.textContent = cards.length;
-      usersCount.textContent = users.length;
-      ownersCount.textContent = owners;
-      ownedCardsCount.textContent = countOwnedCards(users);
-    }
+      // Popula Cabeçalho
+      modalUserName.textContent = user.username;
+      modalUserInfo.textContent = `Clã: ${String(user.clan || '-').toUpperCase()} | Zap: ${user.whatsapp || 'Não informado'}`;
 
-    async function loadData() {
-      setStatus('Carregando dados...', '');
-      const data = await fetchOverview();
-      overviewData = {
-        cards: Array.isArray(data.cards) ? data.cards : [],
-        users: Array.isArray(data.users) ? data.users : [],
-      };
-      renderStats();
-      renderCards();
-      renderUsers();
-      setStatus('Painel carregado.', 'ok');
-    }
+      // Popula Inventário Atual
+      const cards = Array.isArray(user.cards) ? user.cards : [];
+      // Se não tem cartas, exibe mensagem vazia. Se tem, lista com botão de remover cópia
+  if (!cards.length) {
+    modalInventoryList.innerHTML = '<div class="empty" style="padding: 16px;">A bolsa está vazia.</div>';
+  } else {
+    modalInventoryList.innerHTML = cards.map(entry => `
+      <div class="inventory-item">
+        <div>
+          <span style="font-weight: 700; color: #fff;">${escapeHtml(entry.title)}</span>
+          <span style="color: var(--muted); font-size: 0.8rem; margin-left: 8px;">ID: ${escapeHtml(entry.cardId)}</span>
+        </div>
+        <div class="inventory-actions">
+          <span class="badge" style="background: rgba(255,255,255,0.1); border:none; color:#fff;">x${escapeHtml(entry.quantity)}</span>
+          <button class="btn-icon remove-user-card-btn" data-card-id="${escapeHtml(entry.cardId)}" title="Remover 1 cópia">- 1</button>
+        </div>
+      </div>
+    `).join('');
+  }
 
-    function unlock() {
-      authBox.classList.add('hidden');
-      content.classList.remove('hidden');
-      content.style.display = '';
-    }
+  // Popula o Select de Adicionar Cartas
+  modalCardSelect.innerHTML = overviewData.cards.map(c => 
+    `<option value="${escapeHtml(c.cardId)}">${escapeHtml(c.title)} (#${escapeHtml(c.cardId)})</option>`
+  ).join('') || '<option value="">Nenhuma carta no sistema</option>';
 
-    async function tryUnlock() {
-      const password = passwordInput.value.trim();
-      if (!password) {
-        setStatus('Informe a senha do admin-lite.', 'warn');
-        return;
-      }
+  // Reseta inputs e status do modal
+  modalCardQtd.value = 1;
+  modalActionStatus.classList.add('hidden');
 
-      adminPassword = password;
+  // Exibe Modal
+  userModal.classList.add('active');
+}
 
-      try {
-        await loadData();
-        unlock();
-        sessionStorage.setItem('adminLitePassword', adminPassword);
-      } catch (error) {
-        adminPassword = '';
-        setStatus(error.message, 'error');
-      }
-    }
+function closeModal() {
+  userModal.classList.remove('active');
+  currentModalUser = null;
+}
 
-    unlockBtn.addEventListener('click', () => {
-      tryUnlock();
+// --- AÇÕES DO MODAL ---
+
+// Adicionar Carta ao Usuário
+modalAddCardBtn.addEventListener('click', async () => {
+  if(!currentModalUser) return;
+  const cardId = modalCardSelect.value;
+  const quantity = Math.max(1, Number(modalCardQtd.value) || 1);
+  
+  if(!cardId) {
+    setStatus('Selecione uma carta válida.', 'warn', modalActionStatus);
+    return;
+  }
+
+  setStatus('Entregando...', '', modalActionStatus);
+  try {
+    // Usa a rota principal de assign (certifique-se que o backend suporta isso)
+    const response = await fetch('/api/admin/assign', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({
+        adminPassword,
+        username: currentModalUser.username,
+        cardId,
+        quantity
+      })
     });
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.message || 'Erro ao entregar carta.');
+    
+    setStatus(`Sucesso! ${quantity}x entregues.`, 'ok', modalActionStatus);
+    await loadData(); // Recarrega os dados globais. O loadData já irá chamar openUserModal atualizando a UI.
+  } catch(err) {
+    setStatus(err.message, 'error', modalActionStatus);
+  }
+});
 
-    refreshBtn.addEventListener('click', () => {
-      loadData().catch((error) => setStatus(error.message, 'error'));
+// Remover Cópia de Carta do Usuário (Delegação de Evento no Modal)
+modalInventoryList.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.remove-user-card-btn');
+  if(!btn || !currentModalUser) return;
+  
+  const cardId = btn.getAttribute('data-card-id');
+  setStatus('Removendo 1 cópia...', '', modalActionStatus);
+  
+  try {
+    const response = await fetch('/api/admin/remove', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({
+        adminPassword,
+        username: currentModalUser.username,
+        cardId,
+        quantity: 1 // Removemos apenas 1 por clique para evitar acidentes
+      })
     });
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.message || 'Erro ao remover carta.');
+    
+    setStatus('Cópia removida com sucesso.', 'ok', modalActionStatus);
+    await loadData();
+  } catch(err) {
+    setStatus(err.message, 'error', modalActionStatus);
+  }
+});
 
-    goWalletBtn.addEventListener('click', () => {
-      window.location.href = '/wallet';
+// Excluir Usuário Permanentemente
+modalDeleteUserBtn.addEventListener('click', async () => {
+  if(!currentModalUser) return;
+  const username = currentModalUser.username;
+  
+  if(!window.confirm(`ZONA DE PERIGO!\nTem certeza que deseja DELETAR o usuário [${username}] para sempre? O inventário inteiro dele será destruído.`)) {
+    return;
+  }
+
+  modalDeleteUserBtn.textContent = 'Excluindo Ninja...';
+  modalDeleteUserBtn.disabled = true;
+
+  try {
+    // Rota de deletar usuário - Adapte a URL se o seu backend esperar outro formato
+    const response = await fetch(`/api/admin/users/${encodeURIComponent(username)}`, {
+      method: 'DELETE',
+      headers: getHeaders()
     });
+    const data = await response.json();
+    
+    if (!response.ok || !data.success) throw new Error(data.message || 'Falha ao excluir usuário.');
+    
+    closeModal();
+    setStatus(`Usuário ${username} foi banido para as sombras.`, 'ok', statusText);
+    await loadData();
+  } catch(err) {
+    setStatus(err.message, 'error', modalActionStatus);
+  } finally {
+    modalDeleteUserBtn.textContent = 'Excluir Usuário Permanentemente';
+    modalDeleteUserBtn.disabled = false;
+  }
+});
 
-    logoutBtn.addEventListener('click', () => {
-      sessionStorage.removeItem('adminLitePassword');
-      window.location.reload();
-    });
+// --- DELEGAÇÃO DE EVENTOS BASE ---
 
-    cardSearch.addEventListener('input', renderCards);
-    userSearch.addEventListener('input', renderUsers);
+// Abre modal ao clicar em 'Gerenciar Perfil' na lista de usuários
+usersList.addEventListener('click', (e) => {
+  const btn = e.target.closest('.manage-user-btn');
+  if (btn) {
+    const username = btn.getAttribute('data-username');
+    openUserModal(username);
+  }
+});
 
-    cardsList.addEventListener('click', (event) => {
-      const button = event.target.closest('.delete-card-btn');
-      if (!button) {
-        return;
-      }
+// Deleta carta global ao clicar em 'Excluir Carta' na lista de cartas
+cardsList.addEventListener('click', (e) => {
+  const btn = e.target.closest('.delete-card-btn');
+  if (btn) deleteCard(btn.getAttribute('data-card-id'));
+});
 
-      const cardId = button.getAttribute('data-card-id');
-      deleteCard(cardId).catch((error) => setStatus(error.message, 'error'));
-    });
+// Fecha modal clicando no X ou na área escura do overlay
+closeModalBtn.addEventListener('click', closeModal);
+userModal.addEventListener('click', (e) => {
+  if (e.target === userModal) closeModal();
+});
 
-    window.addEventListener('load', () => {
-      const saved = sessionStorage.getItem('adminLitePassword') || '';
-      if (saved) {
-        adminPassword = saved;
-        loadData()
-          .then(() => {
-            unlock();
-            setStatus('Sessão restaurada.', 'ok');
-          })
-          .catch(() => {
-            sessionStorage.removeItem('adminLitePassword');
-            setStatus('Sessão expirada. Entre novamente.', 'warn');
-          });
-      } else {
-        setStatus('Painel bloqueado. Informe a senha para entrar.', 'warn');
-      }
-    });
-  </script>
+// Pesquisas dinâmicas nos inputs
+cardSearch.addEventListener('input', renderCards);
+userSearch.addEventListener('input', renderUsers);
+
+// --- AUTENTICAÇÃO E START ---
+function unlock() { 
+    authBox.classList.add('hidden'); 
+    content.classList.remove('hidden'); 
+}
+
+unlockBtn.addEventListener('click', async () => {
+  adminPassword = passwordInput.value.trim();
+  if (!adminPassword) return setStatus('Informe a senha.', 'warn');
+  try { 
+      await loadData(); 
+      unlock(); 
+      sessionStorage.setItem('adminLitePassword', adminPassword); 
+  } 
+  catch (error) { 
+      adminPassword = ''; 
+      setStatus(error.message, 'error'); 
+  }
+});
+
+refreshBtn.addEventListener('click', () => loadData());
+goWalletBtn.addEventListener('click', () => window.location.href = '/wallet');
+logoutBtn.addEventListener('click', () => { 
+    sessionStorage.removeItem('adminLitePassword'); 
+    window.location.reload(); 
+});
+
+// Auto-login caso já esteja na session
+window.addEventListener('load', () => {
+  const saved = sessionStorage.getItem('adminLitePassword');
+  if (saved) { 
+      adminPassword = saved; 
+      loadData().then(unlock).catch(() => sessionStorage.removeItem('adminLitePassword')); 
+  }
+});
+</script>
 </body>
 </html>
