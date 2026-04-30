@@ -53,6 +53,7 @@ async function buildWalletPayload(user) {
     cards: userCards.map((entry) => ({
       cardId: entry.cardId,
       quantity: entry.quantity,
+      customDraw: entry.customDraw || '',
       card: cardsById.get(entry.cardId) || null,
     })),
   };
@@ -313,6 +314,53 @@ router.post('/wallet/login', async (req, res) => {
   }
 });
 
+router.post('/wallet/customDraw', async (req, res) => {
+  try {
+    const { username, cardId, customDraw } = req.body;
+
+    if (!username || !cardId) {
+      return res.status(400).json({
+        success: false,
+        message: 'username e cardId sao obrigatorios.',
+      });
+    }
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario nao encontrado.',
+      });
+    }
+
+    const ownedCard = user.cards.find((entry) => entry.cardId === cardId);
+
+    if (!ownedCard) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario nao possui essa carta.',
+      });
+    }
+
+    ownedCard.customDraw = String(customDraw || '').slice(0, 50000);
+
+    await user.save();
+
+    return res.json({
+      success: true,
+      message: 'Desenho personalizado salvo com sucesso.',
+      customDraw: ownedCard.customDraw,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Falha ao salvar o desenho personalizado.',
+      error: error.message,
+    });
+  }
+});
+
 router.post('/admin/cards', async (req, res) => {
   try {
     if (!ensureAdminAccess(req, res)) {
@@ -321,32 +369,16 @@ router.post('/admin/cards', async (req, res) => {
 
     const { cardId, draw, url, title, categoria } = req.body;
 
-    if (!cardId || !draw || !title || !categoria) {
+    if (!cardId || !title || !categoria) {
       return res.status(400).json({
         success: false,
-        message: 'cardId, draw, title e categoria sao obrigatorios.',
-      });
-    }
-
-    if (String(draw).trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'draw nao pode ser vazio.',
-      });
-    }
-
-    const existingCard = await Card.findOne({ cardId });
-
-    if (existingCard) {
-      return res.status(409).json({
-        success: false,
-        message: 'Ja existe carta com esse cardId.',
+        message: 'cardId, title e categoria sao obrigatorios.',
       });
     }
 
     const card = await Card.create({
       cardId,
-      draw,
+      draw: draw || '',
       url: url || '',
       title,
       categoria,
@@ -382,24 +414,17 @@ router.put('/admin/cards/:cardId', async (req, res) => {
       });
     }
 
-    if (!draw || !title || !categoria) {
+    if (!title || !categoria) {
       return res.status(400).json({
         success: false,
-        message: 'draw, title e categoria sao obrigatorios.',
-      });
-    }
-
-    if (String(draw).trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'draw nao pode ser vazio.',
+        message: 'title e categoria sao obrigatorios.',
       });
     }
 
     const card = await Card.findOneAndUpdate(
       { cardId },
       {
-        draw,
+        draw: draw || '',
         url: url || '',
         title,
         categoria,

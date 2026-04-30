@@ -414,7 +414,7 @@
           </div>
 
           <p class="helper" style="margin-bottom: 12px;">
-            Selecione uma carta na lista para editar. O campo draw aceita quebras de linha e espacos no desenho sem encurtar o texto.
+            Selecione uma carta na lista para editar. Os campos draw e imagem sao opcionais. O draw pode conter quebras de linha e espacos. Os usuarios podem adicionar seus proprios desenhos na wallet para copiar.
           </p>
 
           <div class="form-grid">
@@ -422,7 +422,7 @@
             <input class="field" id="titleInput" placeholder="Titulo da carta" />
             <input class="field" id="categoriaInput" placeholder="Categoria livre (ex: Nintai, Fuuton, Taijutsu)" />
             <input class="field" id="urlInput" placeholder="URL da imagem (opcional)" />
-            <textarea class="field full" id="drawInput" placeholder="Cole aqui o draw completo da carta, com espacos e quebras de linha."></textarea>
+            <textarea class="field full" id="drawInput" placeholder="Cole aqui o draw da carta (opcional). Pode conter espacos e quebras de linha."></textarea>
             <div class="full button-row">
               <button class="btn primary" id="saveCardBtn" type="button">Criar carta</button>
               <button class="btn secondary" id="clearCardBtn" type="button">Limpar editor</button>
@@ -700,13 +700,8 @@
         url: urlInput.value.trim(),
       };
 
-      if (!payload.cardId || !payload.draw || !payload.title || !payload.categoria) {
-        setStatus('Preencha cardId, draw, titulo e categoria.', 'warn');
-        return;
-      }
-
-      if (String(payload.draw).trim().length === 0) {
-        setStatus('O draw nao pode ser apenas espacos.', 'warn');
+      if (!payload.cardId || !payload.title || !payload.categoria) {
+        setStatus('Preencha cardId, titulo e categoria.', 'warn');
         return;
       }
 

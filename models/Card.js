@@ -10,7 +10,7 @@ const cardSchema = new mongoose.Schema(
     },
     draw: {
       type: String,
-      required: true,
+      default: '',
     },
     url: {
       type: String,

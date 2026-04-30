@@ -12,6 +12,10 @@ const userOwnedCardSchema = new mongoose.Schema(
       default: 1,
       min: 1,
     },
+    customDraw: {
+      type: String,
+      default: '',
+    },
   },
   {
     _id: false,

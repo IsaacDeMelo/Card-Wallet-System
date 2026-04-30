@@ -290,12 +290,6 @@
     }
     .card:hover .art { filter: brightness(1.1) contrast(1.05); }
 
-    .empty-art {
-      display: flex; align-items: center; justify-content: center; color: var(--text-muted);
-      font-size: 0.8rem; text-transform: uppercase; aspect-ratio: 3/4;
-      pointer-events: none;
-    }
-
     .foot { display: flex; flex-direction: column; gap: 8px; margin-top: auto; pointer-events: none; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; }
     .tag {
@@ -321,12 +315,134 @@
       .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
       .name { font-size: 0.95rem; }
     }
+
+    /* --- MODAL DE EDIÇÃO --- */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal:not(.hidden) {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      cursor: pointer;
+    }
+
+    .modal-content {
+      position: relative;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      width: min(90vw, 500px);
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 1;
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .modal-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+    }
+
+    .close-modal {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+    }
+
+    .modal-textarea {
+      width: 100%;
+      min-height: 200px;
+      max-height: 40vh;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      font-family: monospace;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      resize: vertical;
+      white-space: pre;
+    }
+
+    .modal-textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .modal-textarea:focus {
+      outline: none;
+      border-color: var(--ok);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .modal-footer .btn {
+      width: auto;
+      padding: 10px 24px;
+      flex: 1;
+    }
   </style>
 </head>
 <body>
 
   <!-- Toast (Aviso Copiado) -->
   <div id="toast" class="toast">Carta copiada com sucesso!</div>
+
+  <!-- Modal de Edição de Texto -->
+  <div id="editModal" class="modal hidden">
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Cole o card aqui</h2>
+        <button class="btn-icon close-modal" type="button">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <textarea id="editDrawInput" class="modal-textarea" placeholder="Cole o card aqui para pegar mais tarde"></textarea>
+      <div class="modal-footer">
+        <button class="btn secondary" id="cancelEditBtn" type="button">Cancelar</button>
+        <button class="btn primary" id="saveEditBtn" type="button">Salvar Texto</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Menu Lateral -->
   <div class="overlay" id="overlay"></div>
@@ -397,10 +513,26 @@
     const kpiCopies = document.getElementById('kpiCopies');
     const kpiTopCategory = document.getElementById('kpiTopCategory');
 
+    const editModal = document.getElementById('editModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const editDrawInput = document.getElementById('editDrawInput');
+    const saveEditBtn = document.getElementById('saveEditBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const closeModalBtn = document.querySelector('.close-modal');
+
     let activeUsername = '';
     let allCards = []; 
     let currentRenderedCards =[]; // Salva a lista de cartas visíveis atualmente para a função de copiar
     let toastTimeout;
+    let editingCardIndex = -1;
+    let editingCardId = '';
+
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = String(value || '');
+      return div.innerHTML;
+    }
 
     // --- LÓGICA DO MENU LATERAL E TOAST ---
     function openMenu() { sidebar.classList.add('active'); overlay.classList.add('active'); }
@@ -460,6 +592,79 @@
       if (c === 'senju') { playerClan.style.borderColor = "var(--senju)"; playerClan.style.color = "#6ee7b7"; }
     }
 
+    function openEditModal(cardIndex) {
+      editingCardIndex = cardIndex;
+      const entry = currentRenderedCards[cardIndex];
+      if (!entry || !entry.card) return;
+
+      editingCardId = entry.card.cardId;
+      const cardTitle = entry.card.title || 'Desconhecida';
+      const currentDraw = entry.customDraw || entry.card.draw || '';
+
+      modalTitle.textContent = `Cole o card: ${cardTitle}`;
+      editDrawInput.value = currentDraw;
+      editModal.classList.remove('hidden');
+      editDrawInput.focus();
+    }
+
+    function closeEditModal() {
+      editModal.classList.add('hidden');
+      editingCardIndex = -1;
+      editingCardId = '';
+      editDrawInput.value = '';
+    }
+
+    async function saveEditedDraw() {
+      if (editingCardIndex === -1 || !activeUsername || !editingCardId) {
+        showToast('Erro ao salvar. Tente novamente.', 'error');
+        return;
+      }
+
+      const customDraw = editDrawInput.value;
+
+      saveEditBtn.disabled = true;
+      saveEditBtn.textContent = 'Salvando...';
+
+      try {
+        const response = await fetch('/api/wallet/customDraw', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: activeUsername,
+            cardId: editingCardId,
+            customDraw,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || 'Falha ao salvar texto personalizado.');
+        }
+
+        // Atualiza o customDraw local
+        const entry = currentRenderedCards[editingCardIndex];
+        if (entry) {
+          entry.customDraw = customDraw;
+        }
+
+        // Encontra na lista de todas as cartas e atualiza também
+        const allEntry = allCards.find((c) => c.card && c.card.cardId === editingCardId);
+        if (allEntry) {
+          allEntry.customDraw = customDraw;
+        }
+
+        showToast('Texto salvo com sucesso!', 'success');
+        closeEditModal();
+        applyFilters(); // Re-renderiza
+      } catch (error) {
+        showToast(error.message, 'error');
+      } finally {
+        saveEditBtn.disabled = false;
+        saveEditBtn.textContent = 'Salvar Texto';
+      }
+    }
+
     // --- RENDERIZAÇÃO ---
     function renderCards(cardsToRender) {
       currentRenderedCards = cardsToRender;
@@ -480,22 +685,22 @@
         const title = c.title || 'Desconhecida';
         const url = c.url || '';
         const quantity = Number(entry.quantity) || 0;
+        const hasCustomDraw = Boolean(entry.customDraw && String(entry.customDraw).trim());
+        const drawText = entry.customDraw || (c.draw || '');
         const delay = index * 0.03;
 
         // O 'data-index' armazena a posição da carta na tela para copiarmos o draw correto depois
         return `
-          <article class="card" data-index="${index}" style="animation-delay: ${delay}s; --glow: ${glow};" title="Clique para copiar o texto da carta">
+          <article class="card" data-index="${index}" style="animation-delay: ${delay}s; --glow: ${glow};" title="Clique para copiar">
             <div class="head">
               <h3 class="name">${title}</h3>
               <span class="qty">x${quantity}</span>
             </div>
-            ${url
-              ? `<img class="art" src="${url}" alt="${title}" loading="lazy" />`
-              : `<div class="art empty-art">Sem Arte</div>`}
+            ${url ? `<img class="art" src="${url}" alt="${title}" loading="lazy" />` : ''}
             <div class="foot">
               <div class="tags">
                 <span class="tag rarity">${categoria}</span>
-                <span class="tag draw">📋 Copiar Carta</span>
+                <span class="tag draw">📋 ${hasCustomDraw ? 'Seu Texto' : 'Copiar Carta'}</span>
               </div>
             </div>
           </article>
@@ -512,18 +717,25 @@
       if (idx === null) return;
 
       const entry = currentRenderedCards[idx];
-      const drawText = entry && entry.card ? entry.card.draw : '';
 
-      if (!drawText) {
-        showToast('Esta carta não possui texto associado!', 'error');
-        return;
+      // Prioriza o customDraw do usuário, fallback para o draw da carta global
+      let drawText = '';
+      if (entry.customDraw && String(entry.customDraw).trim()) {
+        drawText = entry.customDraw;
+      } else if (entry && entry.card) {
+        drawText = entry.card.draw || '';
       }
 
+      // Tenta copiar, se falhar ou não tiver texto, abre modal
       try {
+        if (!drawText) {
+          throw new Error('sem_texto');
+        }
         await navigator.clipboard.writeText(drawText);
         showToast('Carta copiada para a área de transferência!');
       } catch (err) {
-        showToast('Não foi possível copiar. Verifique as permissões do navegador.', 'error');
+        // Se falhar na cópia ou não tiver texto, abre o modal de edição
+        openEditModal(parseInt(idx, 10));
       }
     });
 
@@ -542,6 +754,19 @@
     }
 
     searchInput.addEventListener('input', applyFilters);
+
+    // --- MODAL DE EDIÇÃO ---
+    saveEditBtn.addEventListener('click', saveEditedDraw);
+    cancelEditBtn.addEventListener('click', closeEditModal);
+    closeModalBtn.addEventListener('click', closeEditModal);
+    modalOverlay.addEventListener('click', closeEditModal);
+
+    // Fechar modal ao pressionar Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !editModal.classList.contains('hidden')) {
+        closeEditModal();
+      }
+    });
 
     // --- CARREGAMENTO ---
     function computeKpis(cards) {

@@ -319,6 +319,14 @@
         }
         .welcome-modal.show .welcome-card { animation: popIn 260ms cubic-bezier(.2,.9,.25,1); }
         @media (max-width:720px) {
+            .container { height: 100dvh; }
+            .clan-title {
+                font-size: clamp(1.7rem, 7vw, 2.1rem);
+                letter-spacing: 4px;
+            }
+            .uchiha .clan-title { top: 10%; }
+            .senju .clan-title { bottom: 14%; }
+            .expanded .clan-title { top: 8%; font-size: clamp(1.4rem, 6vw, 1.7rem); }
             .welcome-card { flex-direction:column; text-align:center; }
             .welcome-image { order: -1; }
             .welcome-actions { align-items:center; width:100%; }
