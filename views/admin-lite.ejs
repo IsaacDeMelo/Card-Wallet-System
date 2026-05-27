@@ -520,6 +520,49 @@
       border: 2px dashed rgba(76, 222, 128, 0.1);
     }
 
+    /* MOBILE NAVBAR */
+    .mobile-header {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      z-index: 200;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+    }
+
+    .mobile-header-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent);
+      font-family: 'Cinzel', serif;
+    }
+
+    .hamburger {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    /* DRAWER OVERLAY */
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 99;
+    }
+
+    .drawer-overlay.active { display: block; }
+
     /* RESPONSIVE */
     @media (max-width: 1024px) {
       .layout { grid-template-columns: 220px 1fr; }
@@ -530,22 +573,101 @@
     }
 
     @media (max-width: 768px) {
-      .layout { grid-template-columns: 1fr; }
-      .sidebar {
-        width: 100%;
-        height: auto;
-        position: static;
-        border-right: none;
-        border-bottom: 1px solid var(--line);
-        padding: 18px 14px;
-        gap: 16px;
+      .mobile-header { display: flex; }
+      
+      .layout {
+        grid-template-columns: 1fr;
+        padding-top: 60px;
       }
-      .main { padding: 24px 18px; }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 60px;
+        width: 280px;
+        height: calc(100vh - 60px);
+        z-index: 150;
+        background: var(--panel);
+        border-right: 1px solid var(--line);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+        grid-column: auto;
+      }
+
+      .sidebar.active { transform: translateX(0); }
+
+      .main {
+        grid-column: 1;
+        padding: 20px 14px;
+        padding-top: 16px;
+      }
+
+      .page-title { font-size: 1.6rem; }
+      .page-subtitle { font-size: 0.85rem; }
+
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+      .stat { padding: 14px; }
+      .stat-value { font-size: 2rem; }
+      .stat-label { font-size: 0.7rem; }
+
+      .workspace { grid-template-columns: 1fr; gap: 16px; }
+      .panel { padding: 16px; margin-bottom: 16px; border-radius: 12px; }
+      .panel-header { margin-bottom: 14px; padding-bottom: 10px; }
+      .panel-title { font-size: 1.1rem; }
+
+      .form-grid { gap: 10px; }
+      .input-group { margin-bottom: 12px; }
+      .input-label { font-size: 0.75rem; margin-bottom: 6px; }
+
+      input, select, textarea {
+        padding: 11px 12px;
+        font-size: 16px;
+        border-radius: 8px;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 0.95rem;
+        border-radius: 8px;
+      }
+
+      .btn-group {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .btn-small { width: 100%; padding: 12px; }
+
+      .list { max-height: 350px; gap: 10px; }
+      .list-item { padding: 12px; border-radius: 8px; }
+      .list-item-title { font-size: 0.95rem; margin-bottom: 3px; }
+      .list-item-meta { font-size: 0.75rem; }
+
+      .modal-content {
+        padding: 20px;
+        border-radius: 12px;
+        max-width: 100%;
+        margin: 16px;
+      }
+
+      .modal-title { font-size: 1.3rem; }
+      .inventory-item { padding: 10px; gap: 8px; }
+
+      .page-header { margin-bottom: 16px; }
+    }
+
+    @media (max-width: 480px) {
       .stats-grid { grid-template-columns: 1fr; }
-      .workspace { grid-template-columns: 1fr; }
-      .page-title { font-size: 1.8rem; }
-      .btn { width: 100%; }
+      .stat-value { font-size: 1.8rem; }
+      .page-title { font-size: 1.4rem; }
+      .form-grid { gap: 8px; }
+      .workspace { gap: 12px; }
+      .modal-content { margin: 10px; padding: 16px; }
       .btn-group { flex-direction: column; }
+      .nav-section { gap: 6px; }
+      .nav-item { padding: 10px 14px; font-size: 0.85rem; }
     }
   </style>
 </head>
@@ -563,10 +685,20 @@
     </div>
   </div>
 
+  <!-- MOBILE HEADER (NAVBAR) -->
+  <div id="mobileHeader" class="mobile-header">
+    <button class="hamburger" onclick="toggleDrawer()">☰</button>
+    <div class="mobile-header-title" id="mobileTitle">Dashboard</div>
+    <button class="hamburger" onclick="showMenuActions()">⋮</button>
+  </div>
+
+  <!-- DRAWER OVERLAY -->
+  <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+
   <!-- MAIN LAYOUT -->
   <div id="mainLayout" class="layout" style="display: none;">
-    <!-- Sidebar -->
-    <aside class="sidebar">
+    <!-- Sidebar / Drawer (Mobile) -->
+    <aside id="sidebar" class="sidebar">
       <div class="sidebar-logo">
         <span style="font-size: 1.4rem;">🏛️</span>
         <h2>Admin</h2>
@@ -587,9 +719,157 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="main">
-      <!-- Dashboard Section -->
-      <section id="dashboard" class="section active">
+    <main class="main"></main>
+  </div>
+
+  <!-- User Modal -->
+  <div id="userModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modalUserName">Usuário</div>
+          <p style="color: var(--muted); font-size: 0.85rem; margin-top: 4px;" id="modalUserInfo">-</p>
+        </div>
+        <button class="modal-close" onclick="closeUserModal()">&times;</button>
+      </div>
+
+      <div class="modal-section">
+        <h4>Bolsa Ninja (Cartas Atuais)</h4>
+        <div id="modalInventory" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+      <div class="modal-section">
+        <h4>Entregar Nova Carta</h4>
+        <div class="input-group" style="margin-bottom: 12px;">
+          <select id="modalCardSelect"></select>
+        </div>
+        <div class="input-group" style="margin-bottom: 12px;">
+          <input id="modalQuantity" type="number" value="1" min="1" placeholder="Quantidade" />
+        </div>
+        <button class="btn primary" onclick="addCardFromModal()" style="margin-bottom: 8px;">Entregar Carta</button>
+        <button class="btn danger" onclick="deleteUser()">Excluir Usuário Permanentemente</button>
+        <div id="modalStatus" class="status" style="font-size: 0.85rem;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // VARIABLES
+    let adminPassword = '';
+    let allCards = [];
+    let allUsers = [];
+    let currentModalUser = null;
+
+    // DRAWER FUNCTIONS (Mobile)
+    function toggleDrawer() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('drawerOverlay');
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+
+    function closeDrawer() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('drawerOverlay');
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+    }
+
+    function showMenuActions() {
+      // On mobile, show options for refresh/wallet/logout
+      const choice = prompt('Opções:\n1. Atualizar\n2. Wallet\n3. Sair\n\nDigite o número:');
+      if (choice === '1') refreshData();
+      else if (choice === '2') goWallet();
+      else if (choice === '3') logout();
+    }
+
+    // FUNCTIONS
+    function showStatus(elementId, msg, type) {
+      const el = document.getElementById(elementId);
+      el.textContent = msg;
+      el.className = `status show ${type}`;
+      setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    async function authenticate() {
+      adminPassword = document.getElementById('passwordInput').value.trim();
+      if (!adminPassword) {
+        showStatus('authStatus', '❌ Informe a senha', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin-lite/overview', {
+          headers: { 'x-admin-password': adminPassword }
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+          showStatus('authStatus', '❌ Senha incorreta', 'error');
+          adminPassword = '';
+          return;
+        }
+
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('mainLayout').style.display = 'grid';
+        document.getElementById('mobileHeader').style.display = 'flex';
+        refreshData();
+      } catch (e) {
+        showStatus('authStatus', '❌ Erro: ' + e.message, 'error');
+      }
+    }
+
+    function switchSection(section) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById(section).classList.add('active');
+      event.target.classList.add('active');
+      
+      // Update mobile header title
+      const titles = {
+        'dashboard': '📊 Dashboard',
+        'cards': '🃏 Cartas',
+        'users': '👥 Usuários'
+      };
+      document.getElementById('mobileTitle').textContent = titles[section] || 'Admin';
+      
+      // Close drawer on mobile
+      closeDrawer();
+    }
+
+    async function refreshData() {
+      try {
+        const res = await fetch('/api/admin-lite/overview', {
+          headers: { 'x-admin-password': adminPassword }
+        });
+        const data = await res.json();
+
+        allCards = data.cards || [];
+        allUsers = data.users || [];
+
+        updateStats();
+        renderAllSections();
+        populateSelects();
+      } catch (e) {
+        console.error('Erro ao carregar dados:', e);
+      }
+    }
+
+    function renderAllSections() {
+      renderDashboard();
+      renderCardsSection();
+      renderUsersSection();
+    }
+
+    function renderDashboard() {
+      let totalInv = 0, collectors = 0;
+      allUsers.forEach(u => {
+        const cards = u.cards || [];
+        if (cards.length) collectors++;
+        cards.forEach(c => totalInv += c.quantity || 0);
+      });
+
+      const html = `
         <div class="page-header">
           <h1 class="page-title">Dashboard</h1>
           <p class="page-subtitle">Visão geral e gerenciamento rápido</p>
@@ -597,19 +877,19 @@
 
         <div class="stats-grid">
           <div class="stat">
-            <div class="stat-value" id="cardsTotal">0</div>
+            <div class="stat-value" id="cardsTotal">${allCards.length}</div>
             <div class="stat-label">Cartas</div>
           </div>
           <div class="stat">
-            <div class="stat-value" id="usersTotal">0</div>
+            <div class="stat-value" id="usersTotal">${allUsers.length}</div>
             <div class="stat-label">Usuários</div>
           </div>
           <div class="stat">
-            <div class="stat-value" id="collectorsTotal">0</div>
+            <div class="stat-value" id="collectorsTotal">${collectors}</div>
             <div class="stat-label">Colecionadores</div>
           </div>
           <div class="stat">
-            <div class="stat-value" id="inventoryTotal">0</div>
+            <div class="stat-value" id="inventoryTotal">${totalInv}</div>
             <div class="stat-label">Em Posse</div>
           </div>
         </div>
@@ -666,10 +946,23 @@
             </div>
           </div>
         </div>
-      </section>
+      `;
 
-      <!-- Cards Section -->
-      <section id="cards" class="section">
+      const dashboard = document.getElementById('dashboard');
+      if (dashboard) {
+        dashboard.innerHTML = html;
+      } else {
+        const main = document.querySelector('.main');
+        const section = document.createElement('section');
+        section.id = 'dashboard';
+        section.className = 'section active';
+        section.innerHTML = html;
+        main.appendChild(section);
+      }
+    }
+
+    function renderCardsSection() {
+      const html = `
         <div class="page-header">
           <h1 class="page-title">Cartas</h1>
           <p class="page-subtitle">Acervo completo de cartas do sistema</p>
@@ -678,15 +971,36 @@
         <div class="panel">
           <div class="panel-header">
             <h2 class="panel-title">Pesquisar</h2>
-            <span class="badge" id="cardsCount">0</span>
+            <span class="badge" id="cardsCount">${allCards.length}</span>
           </div>
           <input id="cardSearch" type="text" placeholder="Pesquisar por nome ou ID..." oninput="filterCards()" />
-          <div class="list" id="cardsList" style="margin-top: 16px;"></div>
+          <div class="list" id="cardsList" style="margin-top: 16px;">
+            ${allCards.length === 0 ? '<div class="empty">Nenhuma carta</div>' : allCards.map(c => `
+              <div class="list-item" onclick="deleteCardConfirm('${c.cardId}')">
+                <div class="list-item-title">${c.title || c.cardId}</div>
+                <div class="list-item-meta">#${c.cardId} • ${c.categoria || 'N/A'}</div>
+                <span class="list-item-badge">Toque para deletar</span>
+              </div>
+            `).join('')}
+          </div>
         </div>
-      </section>
+      `;
 
-      <!-- Users Section -->
-      <section id="users" class="section">
+      const cards = document.getElementById('cards');
+      if (cards) {
+        cards.innerHTML = html;
+      } else {
+        const main = document.querySelector('.main');
+        const section = document.createElement('section');
+        section.id = 'cards';
+        section.className = 'section';
+        section.innerHTML = html;
+        main.appendChild(section);
+      }
+    }
+
+    function renderUsersSection() {
+      const html = `
         <div class="page-header">
           <h1 class="page-title">Usuários</h1>
           <p class="page-subtitle">Gerenciar shinobis e seus inventários</p>
@@ -695,111 +1009,34 @@
         <div class="panel">
           <div class="panel-header">
             <h2 class="panel-title">Pesquisar</h2>
-            <span class="badge" id="usersCount">0</span>
+            <span class="badge" id="usersCount">${allUsers.length}</span>
           </div>
           <input id="userSearch" type="text" placeholder="Pesquisar por nome ou clã..." oninput="filterUsers()" />
-          <div class="list" id="usersList" style="margin-top: 16px;"></div>
+          <div class="list" id="usersList" style="margin-top: 16px;">
+            ${allUsers.length === 0 ? '<div class="empty">Nenhum usuário</div>' : allUsers.map(u => {
+              const cards = u.cards || [];
+              const total = cards.reduce((s, c) => s + (c.quantity || 0), 0);
+              return `
+                <div class="list-item" onclick="openUserModal('${u.username}')">
+                  <div class="list-item-title">${u.username}</div>
+                  <div class="list-item-meta">🏮 ${u.clan} • ${total} cartas • 📱 ${u.whatsapp || '-'}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
         </div>
-      </section>
-    </main>
-  </div>
+      `;
 
-  <!-- User Modal -->
-  <div id="userModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div>
-          <div class="modal-title" id="modalUserName">Usuário</div>
-          <p style="color: var(--muted); font-size: 0.85rem; margin-top: 4px;" id="modalUserInfo">-</p>
-        </div>
-        <button class="modal-close" onclick="closeUserModal()">&times;</button>
-      </div>
-
-      <div class="modal-section">
-        <h4>Bolsa Ninja (Cartas Atuais)</h4>
-        <div id="modalInventory" style="display: flex; flex-direction: column; gap: 8px;"></div>
-      </div>
-
-      <div class="modal-section">
-        <h4>Entregar Nova Carta</h4>
-        <div class="input-group" style="margin-bottom: 12px;">
-          <select id="modalCardSelect"></select>
-        </div>
-        <div class="input-group" style="margin-bottom: 12px;">
-          <input id="modalQuantity" type="number" value="1" min="1" placeholder="Quantidade" />
-        </div>
-        <button class="btn primary" onclick="addCardFromModal()" style="margin-bottom: 8px;">Entregar Carta</button>
-        <button class="btn danger" onclick="deleteUser()">Excluir Usuário Permanentemente</button>
-        <div id="modalStatus" class="status" style="font-size: 0.85rem;"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // VARIABLES
-    let adminPassword = '';
-    let allCards = [];
-    let allUsers = [];
-    let currentModalUser = null;
-
-    // FUNCTIONS
-    function showStatus(elementId, msg, type) {
-      const el = document.getElementById(elementId);
-      el.textContent = msg;
-      el.className = `status show ${type}`;
-      setTimeout(() => el.classList.remove('show'), 3500);
-    }
-
-    async function authenticate() {
-      adminPassword = document.getElementById('passwordInput').value.trim();
-      if (!adminPassword) {
-        showStatus('authStatus', '❌ Informe a senha', 'error');
-        return;
-      }
-
-      try {
-        const res = await fetch('/api/admin-lite/overview', {
-          headers: { 'x-admin-password': adminPassword }
-        });
-        const data = await res.json();
-
-        if (!data.success) {
-          showStatus('authStatus', '❌ Senha incorreta', 'error');
-          adminPassword = '';
-          return;
-        }
-
-        document.getElementById('authScreen').style.display = 'none';
-        document.getElementById('mainLayout').style.display = 'grid';
-        refreshData();
-      } catch (e) {
-        showStatus('authStatus', '❌ Erro: ' + e.message, 'error');
-      }
-    }
-
-    function switchSection(section) {
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      document.getElementById(section).classList.add('active');
-      event.target.classList.add('active');
-    }
-
-    async function refreshData() {
-      try {
-        const res = await fetch('/api/admin-lite/overview', {
-          headers: { 'x-admin-password': adminPassword }
-        });
-        const data = await res.json();
-
-        allCards = data.cards || [];
-        allUsers = data.users || [];
-
-        updateStats();
-        renderCards();
-        renderUsers();
-        populateSelects();
-      } catch (e) {
-        console.error('Erro ao carregar dados:', e);
+      const users = document.getElementById('users');
+      if (users) {
+        users.innerHTML = html;
+      } else {
+        const main = document.querySelector('.main');
+        const section = document.createElement('section');
+        section.id = 'users';
+        section.className = 'section';
+        section.innerHTML = html;
+        main.appendChild(section);
       }
     }
 
@@ -811,31 +1048,40 @@
         cards.forEach(c => totalInv += c.quantity || 0);
       });
 
-      document.getElementById('cardsTotal').textContent = allCards.length;
-      document.getElementById('usersTotal').textContent = allUsers.length;
-      document.getElementById('collectorsTotal').textContent = collectors;
-      document.getElementById('inventoryTotal').textContent = totalInv;
+      const cardsTotal = document.getElementById('cardsTotal');
+      const usersTotal = document.getElementById('usersTotal');
+      const collectorsTotal = document.getElementById('collectorsTotal');
+      const inventoryTotal = document.getElementById('inventoryTotal');
+
+      if (cardsTotal) cardsTotal.textContent = allCards.length;
+      if (usersTotal) usersTotal.textContent = allUsers.length;
+      if (collectorsTotal) collectorsTotal.textContent = collectors;
+      if (inventoryTotal) inventoryTotal.textContent = totalInv;
     }
 
     function renderCards() {
-      const search = document.getElementById('cardSearch').value.toLowerCase();
+      const search = (document.getElementById('cardSearch') || {}).value?.toLowerCase() || '';
       const filtered = allCards.filter(c =>
         (c.title || '').toLowerCase().includes(search) ||
         (c.cardId || '').toLowerCase().includes(search)
       );
 
-      document.getElementById('cardsCount').textContent = filtered.length;
+      const cardsCount = document.getElementById('cardsCount');
+      if (cardsCount) cardsCount.textContent = filtered.length;
+
+      const cardsList = document.getElementById('cardsList');
+      if (!cardsList) return;
 
       if (!filtered.length) {
-        document.getElementById('cardsList').innerHTML = '<div class="empty">Nenhuma carta encontrada</div>';
+        cardsList.innerHTML = '<div class="empty">Nenhuma carta encontrada</div>';
         return;
       }
 
-      document.getElementById('cardsList').innerHTML = filtered.map(c => `
+      cardsList.innerHTML = filtered.map(c => `
         <div class="list-item" onclick="deleteCardConfirm('${c.cardId}')">
           <div class="list-item-title">${c.title || c.cardId}</div>
           <div class="list-item-meta">#${c.cardId} • ${c.categoria || 'N/A'}</div>
-          <span class="list-item-badge">Clique para deletar</span>
+          <span class="list-item-badge">Toque para deletar</span>
         </div>
       `).join('');
     }
@@ -843,20 +1089,24 @@
     function filterCards() { renderCards(); }
 
     function renderUsers() {
-      const search = document.getElementById('userSearch').value.toLowerCase();
+      const search = (document.getElementById('userSearch') || {}).value?.toLowerCase() || '';
       const filtered = allUsers.filter(u =>
         (u.username || '').toLowerCase().includes(search) ||
         (u.clan || '').toLowerCase().includes(search)
       );
 
-      document.getElementById('usersCount').textContent = filtered.length;
+      const usersCount = document.getElementById('usersCount');
+      if (usersCount) usersCount.textContent = filtered.length;
+
+      const usersList = document.getElementById('usersList');
+      if (!usersList) return;
 
       if (!filtered.length) {
-        document.getElementById('usersList').innerHTML = '<div class="empty">Nenhum usuário encontrado</div>';
+        usersList.innerHTML = '<div class="empty">Nenhum usuário encontrado</div>';
         return;
       }
 
-      document.getElementById('usersList').innerHTML = filtered.map(u => {
+      usersList.innerHTML = filtered.map(u => {
         const cards = u.cards || [];
         const total = cards.reduce((s, c) => s + (c.quantity || 0), 0);
         return `
@@ -1077,10 +1327,13 @@
       adminPassword = '';
       document.getElementById('authScreen').style.display = 'flex';
       document.getElementById('mainLayout').style.display = 'none';
+      document.getElementById('mobileHeader').style.display = 'none';
       document.getElementById('passwordInput').value = '';
+      closeDrawer();
     }
 
     // Init
+    document.getElementById('mobileHeader').style.display = 'none';
     document.getElementById('passwordInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') authenticate();
     });
