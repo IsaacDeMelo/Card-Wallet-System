@@ -4,8 +4,8 @@ const User = require('../models/User');
 const Card = require('../models/Card');
 
 const router = express.Router();
-const ADMIN_PANEL_PASSWORD = 'AaOWoaONmKjKo';
-const ADMIN_LITE_PASSWORD = 'adminrpg090920201010';
+const ADMIN_PANEL_PASSWORD = process.env.ADMIN_PANEL_PASSWORD || 'AaOWoaONmKjKo';
+const ADMIN_LITE_PASSWORD = process.env.ADMIN_LITE_PASSWORD || 'adminrpg090920201010';
 
 function sanitizeUser(user) {
   const safeUser = user.toObject ? user.toObject() : { ...user };
@@ -59,7 +59,7 @@ function ensureAdminLiteAccess(req, res) {
 
 async function resolveUserByIdentity({ username }) {
   if (username) {
-    return User.findOne({ username });
+    return User.findOne({ username: String(username).trim() });
   }
 
   return null;
@@ -108,6 +108,7 @@ async function buildAdminLitePayload() {
             const card = cardsById.get(entry.cardId);
 
             return {
+              cardId: entry.cardId,
               title: card ? (card.title || card.cardId) : entry.cardId,
               quantity: entry.quantity || 0,
             };
@@ -685,6 +686,44 @@ router.get('/admin/users', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Falha ao listar usuarios.',
+      error: error.message,
+    });
+  }
+});
+
+router.delete('/admin/users/:username', async (req, res) => {
+  try {
+    if (!ensureAdminAccess(req, res)) {
+      return;
+    }
+
+    const username = String(req.params.username || '').trim();
+
+    if (!username) {
+      return res.status(400).json({
+        success: false,
+        message: 'username e obrigatorio.',
+      });
+    }
+
+    const deletedUser = await User.findOneAndDelete({ username });
+
+    if (!deletedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario nao encontrado.',
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Usuario excluido com sucesso.',
+      username,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Falha ao excluir o usuario.',
       error: error.message,
     });
   }

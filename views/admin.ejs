@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin - Card Wallet</title>
+  <link rel="icon" href="https://img.magnific.com/vetores-gratis/moldura-oriental-vermelha-vetor-de-ilustracao-de-nuvem-chinesa_53876-140200.jpg?semt=ais_hybrid&w=740&q=80" type="image/jpeg" />
+  <link rel="apple-touch-icon" href="https://img.magnific.com/vetores-gratis/moldura-oriental-vermelha-vetor-de-ilustracao-de-nuvem-chinesa_53876-140200.jpg?semt=ais_hybrid&w=740&q=80" />
+  <meta name="theme-color" content="#070b12" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -43,7 +46,7 @@
       background-attachment: fixed; overflow-x: hidden;
     }
 
-    .shell { width: min(1200px, 92vw); margin: 30px auto 60px; display: flex; flex-direction: column; gap: 24px; }
+    .shell { width: min(100%, 1080px); margin: 0 auto; padding: 16px 14px 28px; display: flex; flex-direction: column; gap: 16px; }
 
     /* Painéis Gerais */
     .hero, .panel {
@@ -51,7 +54,7 @@
       backdrop-filter: blur(12px); box-shadow: var(--shadow);
     }
 
-    .hero { padding: 24px; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden; }
+    .hero { padding: 18px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden; }
     .hero::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--primary), transparent); }
 
     .title-row { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
@@ -91,14 +94,13 @@
     .btn.secondary:hover { background: rgba(255,255,255,0.1); }
 
     /* Layout Interno */
-    .dashboard { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; }
-    @media (max-width: 960px) { .dashboard { grid-template-columns: 1fr; } }
+    .dashboard { display: grid; grid-template-columns: 1fr; gap: 16px; }
     
-    .stack { display: flex; flex-direction: column; gap: 24px; }
-    .panel { padding: 24px; }
+    .stack { display: flex; flex-direction: column; gap: 16px; }
+    .panel { padding: 18px; }
     .panel h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; color: #fff; }
 
-    .form-grid { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+    .form-grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
     .form-grid .full { grid-column: 1 / -1; }
 
     .editor-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -124,6 +126,30 @@
     
     .empty { border: 2px dashed rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; text-align: center; color: var(--muted); }
     .hidden { display: none !important; }
+
+    @media (min-width: 640px) {
+      .shell { padding: 18px 16px 36px; }
+      .hero, .panel { border-radius: 22px; }
+      .hero { padding: 20px; }
+      .panel { padding: 20px; }
+      .form-grid { grid-template-columns: 1fr 1fr; }
+      .dashboard { gap: 24px; }
+      .stack { gap: 24px; }
+      .list { max-height: 600px; overflow-y: auto; padding-right: 4px; }
+    }
+
+    @media (min-width: 960px) {
+      .dashboard { grid-template-columns: 1.1fr 0.9fr; }
+    }
+
+    @media (max-width: 639px) {
+      .title-row, .editor-top, .list-item-header { flex-direction: column; align-items: stretch; }
+      .button-row .btn, .btn, .field, select, textarea { width: 100%; }
+      #authBlock { flex-direction: column !important; max-width: none !important; }
+      .pill-row { width: 100%; }
+      .pill { width: 100%; text-align: center; }
+      .button-row { flex-direction: column; }
+    }
   </style>
 </head>
 <body>
@@ -132,12 +158,18 @@
       <div class="title-row">
         <div>
           <h1 class="title">Painel Alto Comando</h1>
-          <p class="subtitle">Controle absoluto. Gerencie usuários, adicione e remova cartas de inventários e crie ou edite cartas complexas (com texto e imagens).</p>
+          <p class="subtitle">Controle absoluto. Gere cartas, ajuste inventários e remova contas direto do sistema sem trocar de tela.</p>
         </div>
         <div class="pill-row">
           <span class="pill">Full Access</span>
           <span class="pill">Economia Ninja</span>
         </div>
+      </div>
+
+      <div class="pill-row">
+        <span class="pill">1. Autentique com a senha mestre</span>
+        <span class="pill">2. Crie ou edite cartas</span>
+        <span class="pill">3. Entregue, remova ou exclua usuários</span>
       </div>
 
       <div id="authBlock" style="display: flex; gap: 12px; max-width: 400px;">

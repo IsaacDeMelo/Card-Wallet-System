@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Card Wallet - Ninja</title>
+  <link rel="icon" href="https://img.magnific.com/vetores-gratis/moldura-oriental-vermelha-vetor-de-ilustracao-de-nuvem-chinesa_53876-140200.jpg?semt=ais_hybrid&w=740&q=80" type="image/jpeg" />
+  <link rel="apple-touch-icon" href="https://img.magnific.com/vetores-gratis/moldura-oriental-vermelha-vetor-de-ilustracao-de-nuvem-chinesa_53876-140200.jpg?semt=ais_hybrid&w=740&q=80" />
+  <meta name="theme-color" content="#0b0f19" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Fonte Poppins -->
@@ -56,19 +59,21 @@
 
     /* --- LAYOUT PRINCIPAL --- */
     .shell {
-      width: min(1200px, 92vw);
-      margin: 0 auto 60px;
+      width: min(100%, 1000px);
+      margin: 0 auto;
+      padding: 0 14px 24px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 16px;
     }
 
     /* --- HEADER E CONTROLES (PESQUISA) --- */
     .topbar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 24px 0 16px;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 18px 0 12px;
       border-bottom: 1px solid var(--line);
     }
 
@@ -108,10 +113,10 @@
     .controls {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       background: var(--panel);
-      padding: 20px;
-      border-radius: 16px;
+      padding: 16px;
+      border-radius: 18px;
       border: 1px solid var(--line);
       backdrop-filter: blur(10px);
     }
@@ -248,8 +253,8 @@
     /* --- GRID DE CARTAS --- */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
+      grid-template-columns: 1fr;
+      gap: 14px;
     }
 
     /* --- ESTILO DAS CARTAS --- */
@@ -311,9 +316,49 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
-    @media (max-width: 768px) {
-      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-      .name { font-size: 0.95rem; }
+    @media (min-width: 640px) {
+      .shell {
+        width: min(1200px, 94vw);
+        padding: 0 0 40px;
+      }
+
+      .controls {
+        padding: 20px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .topbar {
+        align-items: center;
+        padding-top: 24px;
+      }
+    }
+
+    @media (min-width: 960px) {
+      .grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 639px) {
+      .topbar {
+        flex-direction: column;
+      }
+
+      .btn-icon {
+        width: 48px;
+        height: 48px;
+      }
+
+      .search-bar input {
+        padding: 16px 16px 16px 44px;
+      }
+
+      .name {
+        font-size: 0.95rem;
+      }
     }
 
     /* --- MODAL DE EDIÇÃO --- */
@@ -352,9 +397,9 @@
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 20px;
-      padding: 24px;
-      width: min(90vw, 500px);
-      max-height: 80vh;
+      padding: 18px;
+      width: min(94vw, 500px);
+      max-height: 84vh;
       display: flex;
       flex-direction: column;
       gap: 16px;

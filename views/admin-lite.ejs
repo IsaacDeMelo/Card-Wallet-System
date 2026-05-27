@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Lite - Card Wallet</title>
+  <link rel="icon" href="https://img.magnific.com/vetores-gratis/moldura-oriental-vermelha-vetor-de-ilustracao-de-nuvem-chinesa_53876-140200.jpg?semt=ais_hybrid&w=740&q=80" type="image/jpeg" />
+  <link rel="apple-touch-icon" href="https://img.magnific.com/vetores-gratis/moldura-oriental-vermelha-vetor-de-ilustracao-de-nuvem-chinesa_53876-140200.jpg?semt=ais_hybrid&w=740&q=80" />
+  <meta name="theme-color" content="#06110b" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -37,7 +40,7 @@
       background-attachment: fixed; overflow-x: hidden;
     }
 
-    .shell { width: min(1200px, 92vw); margin: 0 auto; padding: 32px 0 60px; display: flex; flex-direction: column; gap: 24px; }
+    .shell { width: min(100%, 1080px); margin: 0 auto; padding: 16px 14px 28px; display: flex; flex-direction: column; gap: 16px; }
 
     /* Painéis e Cards */
     .hero, .auth-box, .panel, .stat {
@@ -45,7 +48,7 @@
       backdrop-filter: blur(12px); box-shadow: var(--shadow);
     }
 
-    .hero { padding: 24px; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden; }
+    .hero { padding: 18px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden; }
     .hero::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
 
     .eyebrow { text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-size: 0.8rem; font-weight: 800; }
@@ -84,24 +87,23 @@
     .status.error { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
     .status.warn { color: #fcd34d; background: rgba(252, 211, 77, 0.1); }
 
-    .auth-box { padding: 24px; max-width: 500px; margin: 0 auto; width: 100%; }
-    .auth-row { display: flex; gap: 12px; }
+    .auth-box { padding: 18px; max-width: 500px; margin: 0 auto; width: 100%; }
+    .auth-row { display: flex; gap: 12px; flex-direction: column; }
 
     /* Grid e Layout Interno */
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
     .stat { padding: 20px; text-align: center; }
     .stat p { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
     .stat h3 { font-size: 2rem; font-family: 'Cinzel', serif; color: var(--accent); margin-top: 8px; }
 
-    .workspace { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
-    @media(max-width: 900px) { .workspace { grid-template-columns: 1fr; } }
+    .workspace { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
 
-    .panel { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .panel { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
     .panel-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; }
     .panel-head h2 { font-size: 1.2rem; font-weight: 700; color: #fff; }
 
     /* Criação Rápida */
-    .create-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .create-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
     .create-grid .full { grid-column: 1 / -1; }
 
     .list { display: grid; gap: 12px; max-height: 600px; overflow-y: auto; padding-right: 4px; }
@@ -119,6 +121,37 @@
 
     .empty { padding: 30px; text-align: center; border-radius: 16px; border: 2px dashed rgba(255,255,255,0.1); color: var(--muted); }
     .hidden { display: none !important; }
+
+    @media (min-width: 640px) {
+      .shell { padding: 18px 16px 36px; }
+      .hero, .auth-box, .panel, .stat { border-radius: 22px; }
+      .hero { padding: 20px; }
+      .auth-box { padding: 20px; }
+      .panel { padding: 20px; }
+      .auth-row { flex-direction: row; }
+      .create-grid { grid-template-columns: 1fr 1fr; }
+      .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+      .workspace { gap: 24px; }
+      .list { max-height: 600px; overflow-y: auto; padding-right: 4px; }
+    }
+
+    @media (min-width: 960px) {
+      .workspace { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 639px) {
+      .hero-row, .title-row, .panel-head { align-items: stretch; }
+      .hero-row { flex-direction: column; }
+      .hero-row .hero-row { width: 100%; }
+      .button-row .btn, .btn, .field, select { width: 100%; }
+      .pill-row { width: 100%; }
+      .pill { width: 100%; text-align: center; }
+      .list-item-header, .user-top { flex-direction: column; gap: 10px; }
+      .inventory-item { gap: 10px; align-items: flex-start; }
+      .inventory-actions { width: 100%; justify-content: space-between; }
+      .add-card-row { flex-direction: column; align-items: stretch; }
+      .add-card-row .btn { width: 100%; }
+    }
 
     /* Estilos do Modal de Usuário */
     .modal-overlay {
@@ -155,7 +188,7 @@
       <div class="eyebrow">Modo Administrador (Lite)</div>
       <div>
         <h1>Biblioteca Ninja</h1>
-        <p class="subtitle">Visão simplificada para consulta de usuários, criação rápida de cartas base e gerenciamento ágil de inventários.</p>
+        <p class="subtitle">Visão simplificada para consultar usuários, criar cartas base e abrir o modal para entregar, remover ou apagar inventários.</p>
       </div>
       <div class="hero-row">
         <div class="pill-row">
@@ -167,6 +200,12 @@
           <button class="btn secondary" id="goWalletBtn"><svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Wallet</button>
           <button class="btn danger" id="logoutBtn"><svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>Sair</button>
         </div>
+      </div>
+
+      <div class="pill-row">
+        <span class="pill">1. Desbloqueie com a senha lite</span>
+        <span class="pill">2. Use o modal do usuário</span>
+        <span class="pill">3. Crie cartas base sem sair daqui</span>
       </div>
     </section>
 
