@@ -498,6 +498,69 @@
       margin-bottom: 8px;
     }
 
+    /* RECRUITMENT */
+    .recruitment-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(76, 222, 128, 0.05) 0%, rgba(76, 222, 128, 0.02) 100%);
+      border: 1px solid rgba(76, 222, 128, 0.15);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .recruitment-item:hover {
+      background: linear-gradient(135deg, rgba(76, 222, 128, 0.1) 0%, rgba(76, 222, 128, 0.05) 100%);
+      border-color: rgba(76, 222, 128, 0.25);
+      box-shadow: 0 4px 12px rgba(76, 222, 128, 0.1);
+    }
+
+    .recruitment-rank {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 50px;
+    }
+
+    .rank-medal {
+      font-size: 1.8rem;
+    }
+
+    .rank-position {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .recruitment-info {
+      flex: 1;
+    }
+
+    .recruitment-name {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 0.95rem;
+      margin-bottom: 3px;
+    }
+
+    .recruitment-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .recruitment-badge {
+      background: linear-gradient(135deg, var(--accent) 0%, #3dd66f 100%);
+      color: var(--bg-dark);
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      min-width: 40px;
+      text-align: center;
+    }
+
     /* STATUS */
     .status {
       padding: 12px 16px;
@@ -655,6 +718,11 @@
       .modal-title { font-size: 1.3rem; }
       .inventory-item { padding: 10px; gap: 8px; }
 
+      .recruitment-item { padding: 12px; gap: 12px; }
+      .rank-medal { font-size: 1.4rem; }
+      .recruitment-name { font-size: 0.9rem; }
+      .recruitment-badge { padding: 5px 10px; font-size: 0.75rem; }
+
       .page-header { margin-bottom: 16px; }
     }
 
@@ -709,6 +777,7 @@
         <button class="nav-item active" onclick="switchSection('dashboard')">📊 Dashboard</button>
         <button class="nav-item" onclick="switchSection('cards')">🃏 Cartas</button>
         <button class="nav-item" onclick="switchSection('users')">👥 Usuários</button>
+        <button class="nav-item" onclick="switchSection('recruitment')">🎖️ Recrutamento</button>
       </div>
 
       <div class="nav-actions">
@@ -859,6 +928,7 @@
       renderDashboard();
       renderCardsSection();
       renderUsersSection();
+      renderRecruitmentSection();
     }
 
     function renderDashboard() {
@@ -1037,6 +1107,81 @@
         section.className = 'section';
         section.innerHTML = html;
         main.appendChild(section);
+      }
+    }
+
+    function renderRecruitmentSection() {
+      const html = `
+        <div class="page-header">
+          <h1 class="page-title">Recrutamento</h1>
+          <p class="page-subtitle">Ranking de recrutadores ninja</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">🎖️ Ranking de Recrutadores</h2>
+            <span class="badge" id="recruitmentCount">0</span>
+          </div>
+          <div class="recruitment-ranking" id="recruitmentList" style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="empty">Carregando ranking...</div>
+          </div>
+        </div>
+      `;
+
+      const recruitment = document.getElementById('recruitment');
+      if (recruitment) {
+        recruitment.innerHTML = html;
+      } else {
+        const main = document.querySelector('.main');
+        const section = document.createElement('section');
+        section.id = 'recruitment';
+        section.className = 'section';
+        section.innerHTML = html;
+        main.appendChild(section);
+      }
+
+      loadRecruitmentRanking();
+    }
+
+    async function loadRecruitmentRanking() {
+      try {
+        const res = await fetch('/api/admin-lite/recruitment', {
+          headers: { 'x-admin-password': adminPassword }
+        });
+        const data = await res.json();
+
+        if (!data.success) return;
+
+        const ranking = data.ranking || [];
+        const recruitmentCount = document.getElementById('recruitmentCount');
+        if (recruitmentCount) recruitmentCount.textContent = data.totalRecruited || 0;
+
+        const recruitmentList = document.getElementById('recruitmentList');
+        if (!recruitmentList) return;
+
+        if (!ranking.length) {
+          recruitmentList.innerHTML = '<div class="empty">Nenhum recrutamento registrado ainda</div>';
+          return;
+        }
+
+        recruitmentList.innerHTML = ranking.map((item, index) => {
+          const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '⭐';
+          return `
+            <div class="recruitment-item">
+              <div class="recruitment-rank">
+                <span class="rank-medal">${medal}</span>
+                <span class="rank-position">#${index + 1}</span>
+              </div>
+              <div class="recruitment-info">
+                <div class="recruitment-name">${item.recruiter}</div>
+                <div class="recruitment-meta">${item.recruits} ninja${item.recruits !== 1 ? 's' : ''} recrutado${item.recruits !== 1 ? 's' : ''}</div>
+              </div>
+              <div class="recruitment-badge">${item.recruits}</div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error('Erro ao carregar recrutamento:', e);
       }
     }
 

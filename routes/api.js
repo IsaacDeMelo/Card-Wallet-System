@@ -137,7 +137,7 @@ async function deleteCardEverywhere(cardId) {
 
 router.post('/register', async (req, res) => {
   try {
-    const { username, whatsapp, password, profile_pic, clan } = req.body;
+    const { username, whatsapp, password, profile_pic, clan, recruitedBy } = req.body;
 
     if (!username || !whatsapp || !password || !clan) {
       return res.status(400).json({
@@ -157,6 +157,18 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Validate referrer if provided
+    let referrerExists = null;
+    if (recruitedBy) {
+      referrerExists = await User.findOne({ username: String(recruitedBy).trim() });
+      if (!referrerExists) {
+        return res.status(400).json({
+          success: false,
+          message: 'Recrutador nao encontrado.',
+        });
+      }
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({
       username,
@@ -164,6 +176,7 @@ router.post('/register', async (req, res) => {
       passwordHash,
       profilePic: profile_pic || '',
       clan,
+      recruitedBy: recruitedBy ? String(recruitedBy).trim() : null,
     });
 
     return res.status(201).json({
@@ -454,6 +467,44 @@ router.get('/admin-lite/overview', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Falha ao carregar o admin-lite.',
+      error: error.message,
+    });
+  }
+});
+
+router.get('/admin-lite/recruitment', async (req, res) => {
+  try {
+    if (!ensureAdminLiteAccess(req, res)) {
+      return;
+    }
+
+    // Get all users with recruitment data
+    const users = await User.find({ recruitedBy: { $ne: null } }).sort({ recruitedBy: 1 });
+
+    // Count recruits per recruiter
+    const recruitmentMap = new Map();
+    users.forEach((user) => {
+      const recruiter = user.recruitedBy;
+      recruitmentMap.set(recruiter, (recruitmentMap.get(recruiter) || 0) + 1);
+    });
+
+    // Build ranking array
+    const ranking = Array.from(recruitmentMap.entries())
+      .map(([recruiter, count]) => ({
+        recruiter,
+        recruits: count,
+      }))
+      .sort((a, b) => b.recruits - a.recruits);
+
+    return res.json({
+      success: true,
+      ranking,
+      totalRecruited: users.length,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Falha ao carregar ranking de recrutamento.',
       error: error.message,
     });
   }

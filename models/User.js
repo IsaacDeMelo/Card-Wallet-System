@@ -57,6 +57,11 @@ const userSchema = new mongoose.Schema(
       type: [userOwnedCardSchema],
       default: [],
     },
+    recruitedBy: {
+      type: String,
+      default: null,
+      trim: true,
+    },
   },
   {
     timestamps: true,
