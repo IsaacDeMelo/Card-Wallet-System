@@ -159,15 +159,19 @@ router.post('/register', async (req, res) => {
 
     // Validate referrer if provided
     let referrerExists = null;
-    if (recruitedBy) {
-      referrerExists = await User.findOne({ username: String(recruitedBy).trim() });
-      if (!referrerExists) {
-        return res.status(400).json({
-          success: false,
-          message: 'Recrutador nao encontrado.',
-        });
-      }
-    }
+
+if (recruitedBy) {
+  referrerExists = await User.findOne({
+    username: new RegExp(`^${String(recruitedBy).trim()}$`, 'i')
+  });
+
+  if (!referrerExists) {
+    return res.status(400).json({
+      success: false,
+      message: 'Recrutador nao encontrado.',
+    });
+  }
+}
 
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({
