@@ -88,6 +88,11 @@
 
         .clan-box.expanded {
             flex: 1;
+            /* permitir que o personagem ultrapasse a caixa quando expandido */
+            overflow: visible;
+            /* trazer o container expandido acima do drawer */
+            z-index: 120;
+            position: relative;
         }
 
         /* =========================================
@@ -221,6 +226,9 @@
         .expanded .pos-center {
             transform: translateX(-50%) scale(1.1);
             margin-bottom: 25vh !important;
+            /* garantir que o personagem central apareça acima do form-drawer */
+            z-index: 300 !important;
+            pointer-events: auto;
         }
 
         .uchiha.expanded .pos-center {
@@ -656,6 +664,7 @@
 
             .expanded .pos-center {
                 transform: translateX(-50%) scale(1.04);
+                z-index: 300 !important;
             }
 
             .uchiha.expanded .pos-center {
