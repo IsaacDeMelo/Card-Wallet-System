@@ -1,18 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RPG - Escolha seu Clã</title>
     <link rel="icon" href="https://img.magnific.com/vetores-gratis/moldura-oriental-vermelha-vetor-de-ilustracao-de-nuvem-chinesa_53876-140200.jpg?semt=ais_hybrid&w=740&q=80" type="image/jpeg">
-    <link rel="apple-touch-icon" href="https://img.magnific.com/vetores-gratis/moldura-oriental-vermelha-vetor-de-ilustracao-de-nuvem-chinesa_53876-140200.jpg?semt=ais_hybrid&w=740&q=80">
-    <meta name="theme-color" content="#000000">
     <!-- Importando fontes -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&family=Bangers&family=Luckiest+Guy&display=swap"
-        rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;400;600&family=Bangers&family=Luckiest+Guy&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -25,35 +19,23 @@
             font-family: 'Poppins', sans-serif;
             background: #000;
             color: #fff;
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
-        h1,
-        h2 {
-            font-family: 'Cinzel', serif;
-        }
+        h1, h2 { font-family: 'Cinzel', serif; }
 
         .container {
             display: flex;
             flex-direction: column;
             width: 100vw;
-            min-height: 100vh;
+            height: 100vh;
         }
 
         /* Movimento super suave no fundo, sem brilho excessivo */
         @keyframes gradientMove {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .clan-box {
@@ -66,7 +48,6 @@
             align-items: center;
             justify-content: center;
             background-size: 150% 150%;
-            min-height: 50vh;
         }
 
         /* Cores de fundo neutras e maduras */
@@ -74,21 +55,13 @@
             background-image: linear-gradient(135deg, #330000, #110000, #000000);
             animation: gradientMove 10s ease infinite;
         }
-
         .clan-box.senju {
             background-image: linear-gradient(135deg, #00220a, #001105, #000000);
             animation: gradientMove 10s ease infinite reverse;
         }
 
-        .clan-box.collapsed {
-            flex: 0;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .clan-box.expanded {
-            flex: 1;
-        }
+        .clan-box.collapsed { flex: 0; opacity: 0; pointer-events: none; }
+        .clan-box.expanded { flex: 1; }
 
         /* =========================================
            FLECHAS NEUTRAS E ELEGANTES
@@ -110,40 +83,19 @@
         .arrow {
             width: 30px;
             height: 30px;
-            color: rgba(255, 255, 255, 0.5);
-            /* Cor neutra, sem neon */
+            color: rgba(255, 255, 255, 0.5); /* Cor neutra, sem neon */
         }
 
-        .arrow.up {
-            animation: floatUp 2s infinite ease-in-out;
-        }
-
-        .arrow.down {
-            animation: floatDown 2s infinite ease-in-out;
-        }
+        .arrow.up { animation: floatUp 2s infinite ease-in-out; }
+        .arrow.down { animation: floatDown 2s infinite ease-in-out; }
 
         @keyframes floatUp {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-8px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
-
         @keyframes floatDown {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(8px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
         }
 
         /* Títulos sem neon brega, apenas contraste elegante */
@@ -153,23 +105,12 @@
             color: rgba(255, 255, 255, 0.9);
             letter-spacing: 10px;
             z-index: 10;
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
-            /* Sombra escura de profundidade */
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8); /* Sombra escura de profundidade */
             transition: all 0.5s ease;
         }
-
-        .uchiha .clan-title {
-            top: 8%;
-        }
-
-        .senju .clan-title {
-            bottom: 8%;
-        }
-
-        .expanded .clan-title {
-            top: 5%;
-            font-size: 1.8rem;
-        }
+        .uchiha .clan-title { top: 8%; }
+        .senju .clan-title { bottom: 8%; }
+        .expanded .clan-title { top: 5%; font-size: 1.8rem; }
 
         /* =========================================
            CARROSSEL DE PERSONAGENS GIRANDO (3D)
@@ -186,7 +127,7 @@
             position: absolute;
             bottom: 0;
             object-fit: contain;
-            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.8));
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8));
             transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
@@ -199,17 +140,13 @@
             opacity: 1;
         }
 
-        .senju .pos-center {
-            height: 78%;
-        }
-
         .pos-right {
             left: 80%;
             height: 65%;
             transform: translateX(-50%) scale(0.9);
             z-index: 2;
             opacity: 0.6;
-            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.8)) brightness(0.6);
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8)) brightness(0.6);
         }
 
         .pos-left {
@@ -218,195 +155,50 @@
             transform: translateX(-50%) scale(0.9);
             z-index: 2;
             opacity: 0.6;
-            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.8)) brightness(0.6);
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8)) brightness(0.6);
         }
 
         /* Quando o form abre, o personagem central sobe, os das bordas somem pro form não sobrepor */
-        .expanded .pos-center {
-            transform: translateX(-50%) scale(1.1);
-            margin-bottom: 25vh !important;
-        }
-
-        .uchiha.expanded .pos-center {
-            margin-bottom: 14vh !important;
-        }
-
-        .senju.expanded .pos-center {
-            margin-bottom: 12vh !important;
-        }
-
-        .expanded .pos-left,
-        .expanded .pos-right {
-            opacity: 0;
-        }
+        .expanded .pos-center { transform: translateX(-50%) scale(1.1); margin-bottom: 25vh !important; }
+        .expanded .pos-left, .expanded .pos-right { opacity: 0; }
 
         /* =========================================
            PARTÍCULAS SEM GLOW, APENAS OPACIDADE
         =========================================== */
-        .particle {
-            position: absolute;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0;
-        }
-
+        .particle { position: absolute; pointer-events: none; z-index: 1; opacity: 0; }
         /* Fogo matte */
-        .spark {
-            background: rgba(255, 90, 90, 0.6);
-            border-radius: 50%;
-            bottom: 0;
-            animation: flyUp linear infinite;
-        }
-
+        .spark { background: rgba(255, 90, 90, 0.6); border-radius: 50%; bottom: 0; animation: flyUp linear infinite; }
         /* Folhas matte */
-        .leaf {
-            background: rgba(90, 255, 90, 0.6);
-            border-radius: 0 50% 0 50%;
-            top: 0;
-            animation: fallDown linear infinite;
-        }
+        .leaf { background: rgba(90, 255, 90, 0.6); border-radius: 0 50% 0 50%; top: 0; animation: fallDown linear infinite; }
 
-        @keyframes flyUp {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 0;
-            }
-
-            20% {
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: translateY(-60vh) scale(0.2);
-                opacity: 0;
-            }
-        }
-
-        @keyframes fallDown {
-            0% {
-                transform: translateY(0) rotate(0deg) scale(1);
-                opacity: 0;
-            }
-
-            20% {
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: translateY(60vh) rotate(360deg) scale(0.2);
-                opacity: 0;
-            }
-        }
+        @keyframes flyUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 20% { opacity: 0.8; } 100% { transform: translateY(-60vh) scale(0.2); opacity: 0; } }
+        @keyframes fallDown { 0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0; } 20% { opacity: 0.8; } 100% { transform: translateY(60vh) rotate(360deg) scale(0.2); opacity: 0; } }
 
         /* =========================================
            FORMULÁRIO GAVETA DARK MATTE
         =========================================== */
         .form-drawer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #0f0f0f;
-            padding: 25px 20px 40px 20px;
-            border-radius: 25px 25px 0 0;
-            z-index: 300;
-            transform: translateY(100%);
-            transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8);
+            position: fixed; bottom: 0; left: 0; width: 100%; background: #0f0f0f;
+            padding: 25px 20px 40px 20px; border-radius: 25px 25px 0 0; z-index: 100;
+            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
         }
-
-        .form-drawer.show {
-            transform: translateY(0);
-        }
-
-        .drag-handle {
-            width: 40px;
-            height: 4px;
-            background: #444;
-            border-radius: 4px;
-            margin: 0 auto 20px auto;
-        }
-
-        .form-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .form-header h2 {
-            font-size: 1.4rem;
-            color: #fff;
-        }
-
-        .btn-voltar {
-            background: none;
-            border: none;
-            color: #777;
-            font-size: 0.9rem;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        .input-group {
-            margin-bottom: 18px;
-        }
-
-        .input-group label {
-            display: block;
-            color: #aaa;
-            margin-bottom: 5px;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 14px;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-            transition: border 0.3s;
-        }
-
-        .input-group input:focus {
-            border-color: #666;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            text-transform: uppercase;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: filter 0.3s;
-            color: white;
-        }
+        .form-drawer.show { transform: translateY(0); }
+        .drag-handle { width: 40px; height: 4px; background: #444; border-radius: 4px; margin: 0 auto 20px auto; }
+        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .form-header h2 { font-size: 1.4rem; color: #fff; }
+        .btn-voltar { background: none; border: none; color: #777; font-size: 0.9rem; text-decoration: underline; cursor: pointer; }
+        .input-group { margin-bottom: 18px; }
+        .input-group label { display: block; color: #aaa; margin-bottom: 5px; font-size: 12px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 15px; outline: none; transition: border 0.3s; }
+        .input-group input:focus { border-color: #666; }
+        .btn-submit { width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: 'Poppins', sans-serif; text-transform: uppercase; cursor: pointer; margin-top: 10px; transition: filter 0.3s; color: white; }
 
         /* Temas super sutis no Form */
-        .form-drawer.theme-uchiha {
-            border-top: 2px solid #8b0000;
-        }
-
-        .form-drawer.theme-uchiha .btn-submit {
-            background: #8b0000;
-        }
-
-        .form-drawer.theme-senju {
-            border-top: 2px solid #004d00;
-        }
-
-        .form-drawer.theme-senju .btn-submit {
-            background: #004d00;
-        }
+        .form-drawer.theme-uchiha { border-top: 2px solid #8b0000; }
+        .form-drawer.theme-uchiha .btn-submit { background: #8b0000; }
+        .form-drawer.theme-senju { border-top: 2px solid #004d00; }
+        .form-drawer.theme-senju .btn-submit { background: #004d00; }
 
         /* ==========================
            MODAL DE BEM-VINDO IMERSIVO (Mobile-first)
@@ -417,8 +209,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(120% 120% at 50% 20%, rgba(255, 255, 255, 0.04), transparent 60%),
-                linear-gradient(180deg, #090909 0%, #050505 100%);
+            background: radial-gradient(120% 120% at 50% 20%, rgba(255,255,255,0.04), transparent 60%),
+                        linear-gradient(180deg, #090909 0%, #050505 100%);
             z-index: 10000;
             opacity: 0;
             pointer-events: none;
@@ -426,45 +218,23 @@
             --accent: #8b0000;
             --accent-soft: rgba(139, 0, 0, 0.35);
         }
-
-        .welcome-modal[data-clan="senju"] {
-            --accent: #1f7a2e;
-            --accent-soft: rgba(31, 122, 46, 0.35);
-        }
-
-        .welcome-modal.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
+        .welcome-modal[data-clan="senju"] { --accent: #1f7a2e; --accent-soft: rgba(31, 122, 46, 0.35); }
+        .welcome-modal.show { opacity: 1; pointer-events: auto; }
         .welcome-modal::before,
         .welcome-modal::after {
             content: '';
             position: absolute;
             inset: -20%;
             background: radial-gradient(40% 30% at 20% 30%, var(--accent-soft), transparent 60%),
-                radial-gradient(30% 40% at 80% 70%, rgba(255, 255, 255, 0.06), transparent 65%);
+                        radial-gradient(30% 40% at 80% 70%, rgba(255,255,255,0.06), transparent 65%);
             opacity: 0.6;
             animation: drift 18s linear infinite;
         }
-
-        .welcome-modal::after {
-            animation-duration: 26s;
-            opacity: 0.35;
-        }
-
+        .welcome-modal::after { animation-duration: 26s; opacity: 0.35; }
         @keyframes drift {
-            0% {
-                transform: translate3d(0, 0, 0) scale(1);
-            }
-
-            50% {
-                transform: translate3d(-2%, -3%, 0) scale(1.02);
-            }
-
-            100% {
-                transform: translate3d(0, 0, 0) scale(1);
-            }
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            50% { transform: translate3d(-2%, -3%, 0) scale(1.02); }
+            100% { transform: translate3d(0, 0, 0) scale(1); }
         }
 
         .welcome-stage {
@@ -480,11 +250,11 @@
         .welcome-card {
             position: relative;
             width: min(980px, 94%);
-            background: rgba(10, 10, 10, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(10,10,10,0.7);
+            border: 1px solid rgba(255,255,255,0.08);
             border-radius: 22px;
             padding: clamp(20px, 5vw, 32px);
-            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.65);
+            box-shadow: 0 30px 90px rgba(0,0,0,0.65);
             backdrop-filter: blur(10px);
             display: flex;
             gap: 22px;
@@ -495,17 +265,15 @@
             transform-origin: center bottom;
             flex-wrap: wrap;
         }
-
         .welcome-card::before {
             content: '';
             position: absolute;
             inset: 0;
             background: radial-gradient(45% 45% at 20% 10%, var(--accent-soft), transparent 60%),
-                linear-gradient(120deg, rgba(255, 255, 255, 0.06), transparent 40%);
+                        linear-gradient(120deg, rgba(255,255,255,0.06), transparent 40%);
             opacity: 0.9;
             pointer-events: none;
         }
-
         .welcome-crest {
             position: absolute;
             right: -70px;
@@ -515,205 +283,64 @@
             border: 1px solid var(--accent);
             border-radius: 50%;
             opacity: 0.35;
-            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.02);
+            box-shadow: 0 0 0 10px rgba(255,255,255,0.02);
         }
-
-        .welcome-left {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .welcome-left h1 {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(2rem, 5vw, 3.2rem);
-            color: #fff;
-            margin: 0;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .welcome-left h1 .welcome-kicker {
-            display: block;
-            font-size: 0.85rem;
-            letter-spacing: 4px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 6px;
-        }
-
-        .welcome-left h1 .welcome-name {
-            color: #fff;
-            text-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
-        }
-
-        .welcome-left p {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            color: #ddd;
-            font-weight: 600;
-        }
-
-        .welcome-left .welcome-clan {
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        .welcome-tagline {
-            font-size: 0.95rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .welcome-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: flex-end;
-            position: relative;
-            z-index: 1;
-        }
-
+        .welcome-left { display:flex; flex-direction:column; gap:8px; position: relative; z-index: 1; }
+        .welcome-left h1 { font-family: 'Cinzel', serif; font-size: clamp(2rem, 5vw, 3.2rem); color:#fff; margin:0; letter-spacing: 2px; text-transform: uppercase; }
+        .welcome-left h1 .welcome-kicker { display:block; font-size: 0.85rem; letter-spacing: 4px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+        .welcome-left h1 .welcome-name { color: #fff; text-shadow: 0 6px 16px rgba(0,0,0,0.55); }
+        .welcome-left p { font-family: 'Poppins', sans-serif; margin:0; color:#ddd; font-weight:600; }
+        .welcome-left .welcome-clan { color: var(--accent); font-weight: 700; }
+        .welcome-tagline { font-size: 0.95rem; color: rgba(255,255,255,0.7); }
+        .welcome-actions { display:flex; flex-direction:column; gap:10px; align-items:flex-end; position: relative; z-index: 1; }
         .welcome-primary {
-            display: inline-block;
-            padding: 12px 18px;
+            display:inline-block;
+            padding:12px 18px;
             background: linear-gradient(135deg, var(--accent), #111 140%);
-            color: #fff;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 700;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            color:#fff;
+            border-radius:12px;
+            text-decoration:none;
+            font-weight:700;
+            border:1px solid rgba(255,255,255,0.08);
         }
-
-        .welcome-close {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: #ddd;
-            padding: 8px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        .welcome-image {
-            position: relative;
-            z-index: 1;
-        }
-
-        .welcome-image img {
-            max-height: 320px;
-            max-width: 220px;
-            object-fit: contain;
-            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
-            animation: float 6s ease-in-out infinite;
-        }
-
+        .welcome-close { background:transparent; border:1px solid rgba(255,255,255,0.12); color:#ddd; padding:8px 12px; border-radius:10px; cursor:pointer; }
+        .welcome-image { position: relative; z-index: 1; }
+        .welcome-image img { max-height: 320px; max-width: 220px; object-fit: contain; filter: drop-shadow(0 8px 20px rgba(0,0,0,0.5)); animation: float 6s ease-in-out infinite; }
         @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-8px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
-
         @keyframes popIn {
-            from {
-                transform: translateY(18px) scale(.98);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
+            from { transform: translateY(18px) scale(.98); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
         }
-
-        .welcome-modal.show .welcome-card {
-            animation: popIn 260ms cubic-bezier(.2, .9, .25, 1);
-        }
-
+        .welcome-modal.show .welcome-card { animation: popIn 260ms cubic-bezier(.2,.9,.25,1); }
         @media (max-width:720px) {
-            .container {
-                height: 100dvh;
-            }
-
+            .container { height: 100dvh; }
             .clan-title {
                 font-size: clamp(1.7rem, 7vw, 2.1rem);
                 letter-spacing: 4px;
             }
-
-            .uchiha .clan-title {
-                top: 10%;
-            }
-
-            .senju .clan-title {
-                bottom: 14%;
-            }
-
-            .expanded .clan-title {
-                top: 8%;
-                font-size: clamp(1.4rem, 6vw, 1.7rem);
-            }
-
-            .expanded .pos-center {
-                transform: translateX(-50%) scale(1.04);
-            }
-
-            .uchiha.expanded .pos-center {
-                margin-bottom: 12vh !important;
-            }
-
-            .senju.expanded .pos-center {
-                margin-bottom: 10vh !important;
-            }
-
-            .senju .pos-center {
-                height: 75%;
-            }
-
-            .welcome-card {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .welcome-image {
-                order: -1;
-            }
-
-            .welcome-actions {
-                align-items: center;
-                width: 100%;
-            }
-        }
-
-        @media (min-width: 721px) {
-            .container {
-                flex-direction: row;
-            }
-
-            .clan-box {
-                min-height: 100vh;
-            }
+            .uchiha .clan-title { top: 10%; }
+            .senju .clan-title { bottom: 14%; }
+            .expanded .clan-title { top: 8%; font-size: clamp(1.4rem, 6vw, 1.7rem); }
+            .welcome-card { flex-direction:column; text-align:center; }
+            .welcome-image { order: -1; }
+            .welcome-actions { align-items:center; width:100%; }
         }
     </style>
 </head>
-
 <body>
 
     <!-- Setas Neutras em SVG (Flechas de verdade) -->
     <div class="center-arrows" id="center-arrows">
         <!-- Flecha Cima -->
-        <svg class="arrow up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
+        <svg class="arrow up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="19" x2="12" y2="5"></line>
             <polyline points="5 12 12 5 19 12"></polyline>
         </svg>
         <!-- Flecha Baixo -->
-        <svg class="arrow down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
+        <svg class="arrow down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <polyline points="19 12 12 19 5 12"></polyline>
         </svg>
@@ -724,12 +351,9 @@
         <div class="clan-box uchiha" onclick="escolherClan('uchiha')">
             <h1 class="clan-title">Uchiha</h1>
             <div class="char-container" id="uchiha-chars">
-                <img src="https://i.pinimg.com/originals/48/1e/15/481e1505a4db3db72e0760f27e13b73f.png" alt="Madara"
-                    class="char uchiha-img">
-                <img src="https://www.pngall.com/wp-content/uploads/14/Itachi-PNG-Photos.png" alt="Itachi"
-                    class="char uchiha-img">
-                <img src="https://www.pngkey.com/png/full/204-2041426_sasuke-uchiha-sasuke-seal-of-shadow.png"
-                    alt="Sasuke" class="char uchiha-img">
+                <img src="https://i.pinimg.com/originals/48/1e/15/481e1505a4db3db72e0760f27e13b73f.png" alt="Madara" class="char uchiha-img">
+                <img src="https://www.pngall.com/wp-content/uploads/14/Itachi-PNG-Photos.png" alt="Itachi" class="char uchiha-img">
+                <img src="https://www.pngkey.com/png/full/204-2041426_sasuke-uchiha-sasuke-seal-of-shadow.png" alt="Sasuke" class="char uchiha-img">
             </div>
         </div>
 
@@ -738,10 +362,8 @@
             <h1 class="clan-title">Senju</h1>
             <div class="char-container" id="senju-chars">
                 <img src="https://i.imgur.com/wLSI0Gg.png" alt="Hashirama" class="char senju-img">
-                <img src="https://i.pinimg.com/originals/6d/e2/59/6de259902e088c3d0bb1757ad2c8528a.png" alt="Tobirama"
-                    class="char senju-img">
-                <img src="https://i.ebayimg.com/images/g/~tUAAOSwUc1h3K88/s-l1200.png" alt="Tsunade"
-                    class="char senju-img">
+                <img src="https://i.pinimg.com/originals/6d/e2/59/6de259902e088c3d0bb1757ad2c8528a.png" alt="Tobirama" class="char senju-img">
+                <img src="https://i.ebayimg.com/images/g/~tUAAOSwUc1h3K88/s-l1200.png" alt="Tsunade" class="char senju-img">
             </div>
         </div>
     </div>
@@ -761,8 +383,7 @@
             </div>
             <div class="input-group">
                 <label>WhatsApp</label>
-                <input type="tel" id="whatsapp" required placeholder="(00) 00000-0000" maxlength="15"
-                    oninput="formatWhatsApp(event)">
+                <input type="tel" id="whatsapp" required placeholder="(00) 00000-0000" maxlength="15" oninput="formatWhatsApp(event)">
             </div>
             <div class="input-group">
                 <label>Senha da Carteira</label>
@@ -786,9 +407,7 @@
                     <p class="welcome-tagline">Respire fundo. Sinta o legado. Avance.</p>
                 </div>
                 <div class="welcome-image">
-                    <img id="ninja-image"
-                        src="https://pt.quizur.com/_image?href=https://img.quizur.com/f/img5d99e1bc199602.72036525.png?lastEdited=1570365888&w=600&h=600&f=webp"
-                        alt="Ninja">
+                    <img id="ninja-image" src="https://pt.quizur.com/_image?href=https://img.quizur.com/f/img5d99e1bc199602.72036525.png?lastEdited=1570365888&w=600&h=600&f=webp" alt="Ninja">
                 </div>
                 <div class="welcome-actions">
                     <button id="welcome-start" class="welcome-primary">Iniciar Jornada</button>
@@ -799,24 +418,11 @@
     </div>
 
     <script>
-        window.addEventListener('load', () => {
-            const params = new URLSearchParams(window.location.search);
-            const fromQuery = (params.get('username') || '').trim();
-            const fromStorage = (localStorage.getItem('walletUsername') || '').trim();
-
-            if (fromQuery) localStorage.setItem('walletUsername', fromQuery);
-
-            const activeUsername = fromQuery || fromStorage;
-            if (activeUsername) {
-                window.location.replace(`/wallet?username=${encodeURIComponent(activeUsername)}`);
-            }
-        });
         /* =========================================
            LÓGICA DO CARROSSEL 3D
         =========================================== */
         const uchihaImages = document.querySelectorAll('.uchiha-img');
         const senjuImages = document.querySelectorAll('.senju-img');
-
         // Posições no ciclo (Centro, Direita, Esquerda)
         const posicoes = ['pos-center', 'pos-right', 'pos-left'];
         let currentIndex = 0;
@@ -885,8 +491,7 @@
 
         function escolherClan(clan) {
             centerArrows.style.opacity = '0';
-
-            if (clan === 'uchiha') {
+            if(clan === 'uchiha') {
                 boxUchiha.classList.add('expanded');
                 boxSenju.classList.add('collapsed');
                 formDrawer.className = 'form-drawer theme-uchiha show';
@@ -920,7 +525,7 @@
             input.value = formatted;
         }
 
-        document.getElementById('rpg-form').addEventListener('submit', function (e) {
+        document.getElementById('rpg-form').addEventListener('submit', function(e) {
             e.preventDefault();
             btnSubmit.innerText = 'Validando...';
 
@@ -966,7 +571,7 @@
         });
 
         /* Modal pós-submit */
-        function showWelcomeModal(name, clan, ninjaUrl) {
+        function showWelcomeModal(name, clan, ninjaUrl){
             const modal = document.getElementById('welcome-modal');
             document.getElementById('welcome-name').innerText = name || 'Bem-vindo!';
             document.getElementById('welcome-clan').innerText = clan || '-';
@@ -975,18 +580,17 @@
                 document.getElementById('ninja-image').src = ninjaUrl;
             }
             modal.classList.add('show');
-            modal.setAttribute('aria-hidden', 'false');
+            modal.setAttribute('aria-hidden','false');
         }
 
         function closeWelcomeModal() {
             const modal = document.getElementById('welcome-modal');
             modal.classList.remove('show');
-            modal.setAttribute('aria-hidden', 'true');
+            modal.setAttribute('aria-hidden','true');
         }
 
         document.getElementById('close-welcome-modal').addEventListener('click', closeWelcomeModal);
         document.getElementById('welcome-start').addEventListener('click', closeWelcomeModal);
     </script>
 </body>
-
 </html>
