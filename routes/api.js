@@ -4,7 +4,7 @@ const User = require('../models/User');
 const Card = require('../models/Card');
 
 const router = express.Router();
-const ADMIN_PANEL_PASSWORD = process.env.ADMIN_PANEL_PASSWORD || 'AaOWoaONmKjKo';
+const ADMIN_PANEL_PASSWORD = process.env.ADMIN_PANEL_PASSWORD || 'adminrpg090920201010';
 const ADMIN_LITE_PASSWORD = process.env.ADMIN_LITE_PASSWORD || 'adminrpg090920201010';
 
 function sanitizeUser(user) {
